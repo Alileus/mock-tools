@@ -21,6 +21,19 @@
 @layer base {
   :root { color-scheme: dark; }
   html, body { @apply bg-bg text-txt font-mono; }
+
+  /* Thin, brand-colored scrollbar */
+  * {
+    scrollbar-width: thin;                                    /* Firefox */
+    scrollbar-color: var(--color-line2) transparent;
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line2);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
 }
 
 /* ── Reusable component classes ───────────────────────────────────────── */

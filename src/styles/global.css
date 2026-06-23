@@ -56,7 +56,7 @@
   }
 
   .btn-copy {
-    @apply mt-3 hidden rounded-md border border-line2 bg-panel2 px-[14px] py-[6px]
+    @apply mt-3 rounded-md border border-line2 bg-panel2 px-[14px] py-[6px]
            text-[11px] text-[#b9c0cb] cursor-pointer;
   }
 

@@ -35,7 +35,7 @@ import Layout from "../layouts/Layout.astro";
         <div class="out-box">
           <div class="primary is-empty" id="id-out">— press generate —</div>
           <div class="meta" id="id-meta"></div>
-          <button class="btn-copy" id="id-copy">copy</button>
+          <button class="btn-copy hidden" id="id-copy">copy</button>
         </div>
         <p class="note">
           10 digits. Lead 1 = citizen, 2 = resident. Last digit = Luhn check. Validated by Luhn (mod
@@ -60,7 +60,7 @@ import Layout from "../layouts/Layout.astro";
               id="iban-legacy"></span>
           </div>
           <div class="meta" id="iban-meta"></div>
-          <button class="btn-copy" id="iban-copy">copy</button>
+          <button class="btn-copy hidden" id="iban-copy">copy</button>
         </div>
         <p class="note">
           SA + 2 check + 2-digit SAMA bank code (chars 5–6) + 18-digit account = 24. MOD-97 (ISO 7064)
@@ -90,7 +90,7 @@ import Layout from "../layouts/Layout.astro";
             Resolved: <span class="val" id="cr-resolved"></span>
           </div>
           <div class="meta" id="cr-meta"></div>
-          <button class="btn-copy" id="cr-copy">copy</button>
+          <button class="btn-copy hidden" id="cr-copy">copy</button>
         </div>
         <p class="note">
           Legacy CR: 10 digits, first 4 = chamber/city (<b>only 1010=Riyadh corroborated</b>; phased
@@ -113,8 +113,8 @@ import Layout from "../layouts/Layout.astro";
           </div>
           <div class="meta" id="phone-meta"></div>
           <div class="flex justify-center gap-2">
-            <button class="btn-copy" id="phone-copy-intl">copy +966…</button>
-            <button class="btn-copy" id="phone-copy-local">copy 0…</button>
+            <button class="btn-copy hidden" id="phone-copy-intl">copy +966…</button>
+            <button class="btn-copy hidden" id="phone-copy-local">copy 0…</button>
           </div>
         </div>
         <p class="note">

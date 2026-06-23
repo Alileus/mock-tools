@@ -1,23 +1,49 @@
 ---
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
+import { SITE_NAME } from "../data/tools.mjs";
 
 interface Props {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
+  /** OG image path relative to site root, e.g. "/og/id.png". */
+  image?: string;
+  keywords?: string;
 }
 
 const {
-  title = "alile.us · mock tools",
-  description = "Sandbox utilities for generating format-valid test fixtures.",
+  title,
+  description,
+  image = "/og/home.png",
+  keywords,
 } = Astro.props;
 
+const site = Astro.site ?? new URL("https://mock.alile.us");
+const pathWithSlash = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : Astro.url.pathname + "/";
+const canonical = new URL(pathWithSlash, site);
+const ogImage = new URL(image, site);
+
 const nav = [
-  { href: "/", label: "Hub" },
-  { href: "/ksa", label: "KSA Fixtures" },
+  { href: "/", label: "Hub", match: (p: string) => p === "/" },
+  { href: "/ksa/id", label: "KSA Fixtures", match: (p: string) => p.startsWith("/ksa") },
 ];
 
-const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const path = Astro.url.pathname;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: title,
+  description,
+  url: canonical.href,
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Any",
+  isAccessibleForFree: true,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  publisher: { "@type": "Organization", name: SITE_NAME, url: site.href },
+};
 ---
 
 <!doctype html>
@@ -25,13 +51,36 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="robots" content="noindex" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImage.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage.href} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
     <Analytics />
   </head>
-  <body class="min-h-screen">
+  <body class="flex min-h-screen flex-col">
     <header class="border-b border-line">
       <nav class="mx-auto flex max-w-[760px] items-center gap-5 px-4 py-3">
         <a href="/" class="text-[13px] font-semibold tracking-[0.04em] text-txt">
@@ -42,7 +91,7 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
             nav.map((item) => (
               <a
                 href={item.href}
-                data-active={(path === item.href).toString()}
+                data-active={item.match(path).toString()}
                 class="rounded-md px-2.5 py-1 text-[12px] text-dim transition-colors hover:text-txt data-[active=true]:bg-panel2 data-[active=true]:text-txt"
               >
                 {item.label}
@@ -53,8 +102,20 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
       </nav>
     </header>
 
-    <main class="mx-auto max-w-[760px] px-4 py-8">
+    <main class="mx-auto w-full max-w-[760px] flex-1 px-4 py-8">
       <slot />
     </main>
+
+    <footer class="border-t border-line">
+      <div class="mx-auto max-w-[760px] px-4 py-5 text-center text-[11px] leading-relaxed text-faint">
+        Managed by Ali · <a
+          href="https://instagram.com/alileus"
+          target="_blank"
+          rel="me noopener noreferrer"
+          class="text-dim underline-offset-2 transition-colors hover:text-txt hover:underline"
+          >@alileus on Instagram</a
+        > — reach out for an update or fix.
+      </div>
+    </footer>
   </body>
 </html>

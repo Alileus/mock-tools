@@ -1,135 +1,199 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import { KSA_TABS, KSA_BY_KEY } from "../data/tools.mjs";
+
+interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+const tab = KSA_BY_KEY[active];
 ---
 
-<Layout
-  title="KSA Mock Fixtures Console"
-  description="Format-valid Saudi test identifiers — National ID, IBAN, UNN/CR, mobile. Fake, sandbox-only."
->
-  <div class="mx-auto max-w-[480px]">
-    <div class="mb-0.5 flex items-baseline justify-between">
-      <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">KSA MOCK FIXTURES</h1>
-      <span class="text-[10px] uppercase tracking-[0.18em] text-faint">sandbox console</span>
-    </div>
-    <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
-    <p class="mb-[18px] mt-0 text-[11.5px] leading-[1.5] text-dim">
-      Format-valid test identifiers. Not real identities, accounts, or numbers. Keep off live lookups
-      and production rails.
-    </p>
-
-    <div class="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
-      <button class="tab-btn" data-tab="id" data-active="true" role="tab">National ID</button>
-      <button class="tab-btn" data-tab="iban" data-active="false" role="tab">IBAN</button>
-      <button class="tab-btn" data-tab="cr" data-active="false" role="tab">UNN / CR</button>
-      <button class="tab-btn" data-tab="phone" data-active="false" role="tab">Mobile</button>
-    </div>
-
-    <div class="rounded-xl border border-line bg-panel p-[22px]">
-      <!-- National ID -->
-      <section id="view-id">
-        <div class="mb-[14px] flex gap-2">
-          <button id="id-citizen" class="seg-btn" data-active="true">Citizen (1)</button>
-          <button id="id-resident" class="seg-btn" data-active="false">Resident (2)</button>
-        </div>
-        <button class="btn-gen" id="id-gen">Generate ID</button>
-        <div class="out-box">
-          <div class="primary is-empty" id="id-out">— press generate —</div>
-          <div class="meta" id="id-meta"></div>
-          <button class="btn-copy hidden" id="id-copy">copy</button>
-        </div>
-        <p class="note">
-          10 digits. Lead 1 = citizen, 2 = resident. Last digit = Luhn check. Validated by Luhn (mod
-          10) — format only; won't resolve without matching DOB at a real backend.
-        </p>
-      </section>
-
-      <!-- IBAN -->
-      <section id="view-iban" class="hidden">
-        <div class="mb-[14px] flex gap-2">
-          <button id="iban-saudi" class="seg-btn" data-active="true">Saudi</button>
-          <button id="iban-intl" class="seg-btn" data-active="false">International</button>
-        </div>
-        <label class="lbl" for="iban-bank">Bank</label>
-        <select id="iban-bank" class="field"></select>
-        <button class="btn-gen" id="iban-gen">Generate IBAN</button>
-        <div class="out-box">
-          <div class="primary is-empty" id="iban-out">— select bank, generate —</div>
-          <div class="resolve hidden mt-[10px] text-[13px]" id="iban-resolveRow">
-            Resolved bank: <span class="val" id="iban-bankname"></span><span
-              class="legacy hidden"
-              id="iban-legacy"></span>
-          </div>
-          <div class="meta" id="iban-meta"></div>
-          <button class="btn-copy hidden" id="iban-copy">copy</button>
-        </div>
-        <p class="note">
-          SA + 2 check + 2-digit SAMA bank code (chars 5–6) + 18-digit account = 24. MOD-97 (ISO 7064)
-          valid. <b>Bank-code table is third-party-sourced; verify against SAMA before non-sandbox use.</b>
-          ⚠ banks flag mergers/renames.
-        </p>
-      </section>
-
-      <!-- CR / UNN -->
-      <section id="view-cr" class="hidden">
-        <div class="mb-[14px] flex gap-2">
-          <button id="cr-unn" class="seg-btn" data-active="true">Unified No. (7)</button>
-          <button id="cr-legacy" class="seg-btn" data-active="false">Legacy CR</button>
-        </div>
-        <div id="cr-block" class="hidden">
-          <label class="lbl" for="cr-city"
-            >City prefix — <span class="text-amber">legacy, mostly unverified</span></label
-          >
-          <select id="cr-city" class="field"></select>
-          <label class="lbl" for="cr-custom">Or custom 4-digit prefix</label>
-          <input id="cr-custom" class="field" inputmode="numeric" maxlength="4" placeholder="e.g. 1010" />
-        </div>
-        <button class="btn-gen" id="cr-gen">Generate</button>
-        <div class="out-box">
-          <div class="primary is-empty" id="cr-out">— press generate —</div>
-          <div class="resolve hidden mt-[10px] text-[13px]" id="cr-resolveRow">
-            Resolved: <span class="val" id="cr-resolved"></span>
-          </div>
-          <div class="meta" id="cr-meta"></div>
-          <button class="btn-copy hidden" id="cr-copy">copy</button>
-        </div>
-        <p class="note">
-          Legacy CR: 10 digits, first 4 = chamber/city (<b>only 1010=Riyadh corroborated</b>; phased
-          out by 2025 unified-CR reform). Unified No.: 10 digits starting 7. <b
-            >No public checksum for either — length+prefix shaped only, not validated.</b
-          >
-        </p>
-      </section>
-
-      <!-- Mobile -->
-      <section id="view-phone" class="hidden">
-        <label class="lbl" for="phone-op">Operator (selects prefix band)</label>
-        <select id="phone-op" class="field"></select>
-        <button class="btn-gen" id="phone-gen">Generate Mobile Number</button>
-        <div class="out-box">
-          <div class="primary is-empty" id="phone-out">— press generate —</div>
-          <div class="mt-1.5 text-[14px] text-dim" id="phone-intl"></div>
-          <div class="resolve hidden mt-[10px] text-[13px]" id="phone-resolveRow">
-            Prefix operator: <span class="val" id="phone-opname"></span>
-          </div>
-          <div class="meta" id="phone-meta"></div>
-          <div class="flex justify-center gap-2">
-            <button class="btn-copy hidden" id="phone-copy-intl">copy +966…</button>
-            <button class="btn-copy hidden" id="phone-copy-local">copy 0…</button>
-          </div>
-        </div>
-        <p class="note">
-          9-digit NSN starting 5 → local 05X XXX XXXX / E.164 +9665XXXXXXXX. <b>Portability:</b> prefix
-          shows originally-allocated operator, not necessarily current. No checksum — format only.
-        </p>
-      </section>
-    </div>
+<div class="mx-auto max-w-[480px]">
+  <div class="mb-0.5 flex items-baseline justify-between">
+    <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">KSA MOCK FIXTURES</h1>
+    <span class="text-[10px] uppercase tracking-[0.18em] text-faint">sandbox console</span>
   </div>
-</Layout>
+  <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
+  <p class="mb-[18px] mt-0 text-[11.5px] leading-[1.5] text-dim">
+    <span class="text-txt">{tab.ogTitle}.</span> Format-valid but fake — keep off live lookups and
+    production rails.
+  </p>
+
+  <div class="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
+    {
+      KSA_TABS.map((t) => (
+        <a
+          href={`/ksa/${t.key}`}
+          class="tab-btn"
+          role="tab"
+          data-active={(t.key === active).toString()}
+          aria-current={t.key === active ? "page" : undefined}
+        >
+          {t.label}
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="rounded-xl border border-line bg-panel p-[22px]">
+    {
+      active === "id" && (
+        <section id="view-id">
+          <div class="mb-[14px] flex gap-2">
+            <button id="id-citizen" class="seg-btn" data-active="true">
+              Citizen (1)
+            </button>
+            <button id="id-resident" class="seg-btn" data-active="false">
+              Resident (2)
+            </button>
+          </div>
+          <button class="btn-gen" id="id-gen">
+            Generate ID
+          </button>
+          <div class="out-box">
+            <div class="primary is-empty" id="id-out">
+              — press generate —
+            </div>
+            <div class="meta" id="id-meta" />
+            <button class="btn-copy hidden" id="id-copy">
+              copy
+            </button>
+          </div>
+          <p class="note">
+            10 digits. Lead 1 = citizen, 2 = resident. Last digit = Luhn check. Validated by Luhn (mod
+            10) — format only; won't resolve without matching DOB at a real backend.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      active === "iban" && (
+        <section id="view-iban">
+          <div class="mb-[14px] flex gap-2">
+            <button id="iban-saudi" class="seg-btn" data-active="true">
+              Saudi
+            </button>
+            <button id="iban-intl" class="seg-btn" data-active="false">
+              International
+            </button>
+          </div>
+          <label class="lbl" for="iban-bank">
+            Bank
+          </label>
+          <select id="iban-bank" class="field" />
+          <button class="btn-gen" id="iban-gen">
+            Generate IBAN
+          </button>
+          <div class="out-box">
+            <div class="primary is-empty" id="iban-out">
+              — select bank, generate —
+            </div>
+            <div class="resolve hidden mt-[10px] text-[13px]" id="iban-resolveRow">
+              Resolved bank: <span class="val" id="iban-bankname" />
+              <span class="legacy hidden" id="iban-legacy" />
+            </div>
+            <div class="meta" id="iban-meta" />
+            <button class="btn-copy hidden" id="iban-copy">
+              copy
+            </button>
+          </div>
+          <p class="note">
+            SA + 2 check + 2-digit SAMA bank code (chars 5–6) + 18-digit account = 24. MOD-97 (ISO
+            7064) valid. <b>Bank-code table is third-party-sourced; verify against SAMA before
+            non-sandbox use.</b> ⚠ banks flag mergers/renames.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      active === "cr" && (
+        <section id="view-cr">
+          <div class="mb-[14px] flex gap-2">
+            <button id="cr-unn" class="seg-btn" data-active="true">
+              Unified No. (7)
+            </button>
+            <button id="cr-legacy" class="seg-btn" data-active="false">
+              Legacy CR
+            </button>
+          </div>
+          <div id="cr-block" class="hidden">
+            <label class="lbl" for="cr-city">
+              City prefix — <span class="text-amber">legacy, mostly unverified</span>
+            </label>
+            <select id="cr-city" class="field" />
+            <label class="lbl" for="cr-custom">
+              Or custom 4-digit prefix
+            </label>
+            <input id="cr-custom" class="field" inputmode="numeric" maxlength="4" placeholder="e.g. 1010" />
+          </div>
+          <button class="btn-gen" id="cr-gen">
+            Generate
+          </button>
+          <div class="out-box">
+            <div class="primary is-empty" id="cr-out">
+              — press generate —
+            </div>
+            <div class="resolve hidden mt-[10px] text-[13px]" id="cr-resolveRow">
+              Resolved: <span class="val" id="cr-resolved" />
+            </div>
+            <div class="meta" id="cr-meta" />
+            <button class="btn-copy hidden" id="cr-copy">
+              copy
+            </button>
+          </div>
+          <p class="note">
+            Legacy CR: 10 digits, first 4 = chamber/city (<b>only 1010=Riyadh corroborated</b>; phased
+            out by 2025 unified-CR reform). Unified No.: 10 digits starting 7. <b>No public checksum
+            for either — length+prefix shaped only, not validated.</b>
+          </p>
+        </section>
+      )
+    }
+
+    {
+      active === "phone" && (
+        <section id="view-phone">
+          <label class="lbl" for="phone-op">
+            Operator (selects prefix band)
+          </label>
+          <select id="phone-op" class="field" />
+          <button class="btn-gen" id="phone-gen">
+            Generate Mobile Number
+          </button>
+          <div class="out-box">
+            <div class="primary is-empty" id="phone-out">
+              — press generate —
+            </div>
+            <div class="mt-1.5 text-[14px] text-dim" id="phone-intl" />
+            <div class="resolve hidden mt-[10px] text-[13px]" id="phone-resolveRow">
+              Prefix operator: <span class="val" id="phone-opname" />
+            </div>
+            <div class="meta" id="phone-meta" />
+            <div class="flex justify-center gap-2">
+              <button class="btn-copy hidden" id="phone-copy-intl">
+                copy +966…
+              </button>
+              <button class="btn-copy hidden" id="phone-copy-local">
+                copy 0…
+              </button>
+            </div>
+          </div>
+          <p class="note">
+            9-digit NSN starting 5 → local 05X XXX XXXX / E.164 +9665XXXXXXXX. <b>Portability:</b>{" "}
+            prefix shows originally-allocated operator, not necessarily current. No checksum — format
+            only.
+          </p>
+        </section>
+      )
+    }
+  </div>
+</div>
 
 <script>
   import { track } from "@vercel/analytics";
 
-  /* ---------- shared ---------- */
   const rd = (n: number) => {
     let s = "";
     for (let i = 0; i < n; i++) s += Math.floor(Math.random() * 10);
@@ -147,28 +211,10 @@ import Layout from "../layouts/Layout.astro";
   const show = (el: Element) => el.classList.remove("hidden");
   const hide = (el: Element) => el.classList.add("hidden");
 
-  /* ---------- tabs ---------- */
-  const tabs = Array.from(document.querySelectorAll<HTMLElement>(".tab-btn"));
-  const views: Record<string, string> = {
-    id: "view-id",
-    iban: "view-iban",
-    cr: "view-cr",
-    phone: "view-phone",
-  };
-  tabs.forEach(
-    (t) =>
-      (t.onclick = () => {
-        tabs.forEach((x) => (x.dataset.active = "false"));
-        t.dataset.active = "true";
-        Object.values(views).forEach((v) => hide($(v)));
-        const tab = t.dataset.tab!;
-        show($(views[tab]));
-        track("tab_switch", { tab });
-      })
-  );
-
   /* ---------- National ID (Luhn) ---------- */
   (() => {
+    const genBtn = document.getElementById("id-gen");
+    if (!genBtn) return;
     let lead = 1;
     const bC = $("id-citizen"),
       bR = $("id-resident");
@@ -212,7 +258,7 @@ import Layout from "../layouts/Layout.astro";
       }
       return s % 10 === 0;
     };
-    $("id-gen").onclick = () => {
+    genBtn.onclick = () => {
       const base = String(lead) + rd(8);
       const id = base + check(base);
       out.textContent = id;
@@ -231,6 +277,8 @@ import Layout from "../layouts/Layout.astro";
 
   /* ---------- IBAN (MOD-97) ---------- */
   (() => {
+    const genBtn = document.getElementById("iban-gen");
+    if (!genBtn) return;
     type Bank = { code: string; name: string; region: string; legacy?: string };
     const BANKS: Bank[] = [
       { code: "01", name: "Saudi Central Bank (SAMA)", region: "saudi" },
@@ -313,7 +361,7 @@ import Layout from "../layouts/Layout.astro";
     const valid = (ib: string) =>
       /^SA\d{22}$/.test(ib) && mod97(toNum(ib.slice(4) + ib.slice(0, 4))) === 1;
     const grp = (ib: string) => ib.replace(/(.{4})/g, "$1 ").trim();
-    $("iban-gen").onclick = () => {
+    genBtn.onclick = () => {
       let code = sel.value;
       if (code === "__random") {
         const p = BANKS.filter((b) => b.region === region);
@@ -340,6 +388,8 @@ import Layout from "../layouts/Layout.astro";
 
   /* ---------- CR / UNN (no checksum) ---------- */
   (() => {
+    const genBtn = document.getElementById("cr-gen");
+    if (!genBtn) return;
     type City = { p: string; name: string; v: boolean };
     const CITIES: City[] = [
       { p: "1010", name: "Riyadh", v: true },
@@ -376,7 +426,7 @@ import Layout from "../layouts/Layout.astro";
       bL.dataset.active = "false";
       hide(block);
     };
-    $("cr-gen").onclick = () => {
+    genBtn.onclick = () => {
       let num, info;
       if (mode === "cr") {
         let pre = custom.value.trim();
@@ -405,6 +455,8 @@ import Layout from "../layouts/Layout.astro";
 
   /* ---------- Mobile (no checksum) ---------- */
   (() => {
+    const genBtn = document.getElementById("phone-gen");
+    if (!genBtn) return;
     type Op = { key: string; name: string; pre: string[] };
     const OPS: Op[] = [
       { key: "stc", name: "STC", pre: ["50", "53", "55"] },
@@ -433,7 +485,7 @@ import Layout from "../layouts/Layout.astro";
       copyLocal = $("phone-copy-local") as HTMLElement;
     const rRow = $("phone-resolveRow"),
       rName = $("phone-opname");
-    $("phone-gen").onclick = () => {
+    genBtn.onclick = () => {
       const op =
         sel.value === "__random"
           ? OPS[Math.floor(Math.random() * OPS.length)]

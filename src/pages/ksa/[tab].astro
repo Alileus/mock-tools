@@ -1,0 +1,20 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import KsaTool from "../../components/KsaTool.astro";
+import { KSA_TABS } from "../../data/tools.mjs";
+
+export function getStaticPaths() {
+  return KSA_TABS.map((t) => ({ params: { tab: t.key }, props: { tab: t } }));
+}
+
+const { tab } = Astro.props;
+---
+
+<Layout
+  title={tab.title}
+  description={tab.description}
+  keywords={tab.keywords}
+  image={`/og/${tab.key}.png`}
+>
+  <KsaTool active={tab.key} />
+</Layout>

@@ -27,7 +27,8 @@
 @layer components {
   .tab-btn {
     @apply flex-1 whitespace-nowrap rounded-lg border border-line2 bg-panel2
-           px-2 py-[9px] text-[12px] text-dim transition-colors cursor-pointer;
+           px-2 py-[9px] text-center text-[12px] text-dim no-underline
+           transition-colors cursor-pointer;
   }
   .tab-btn:hover { @apply text-txt; }
   .tab-btn[data-active="true"] { @apply border-sel bg-sel text-white; }

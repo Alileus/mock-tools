@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* ── Design tokens (ported from the original bespoke palette) ─────────── */
+@theme {
+  --color-bg:     #0f1115;
+  --color-panel:  #171a21;
+  --color-panel2: #1e222b;
+  --color-line:   #262a33;
+  --color-line2:  #2c313b;
+  --color-txt:    #e6e8eb;
+  --color-dim:    #8b919c;
+  --color-faint:  #5a616c;
+  --color-green:  #16a34a;
+  --color-blue:   #60a5fa;
+  --color-amber:  #f59e0b;
+  --color-sel:    #2563eb;
+
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@layer base {
+  :root { color-scheme: dark; }
+  html, body { @apply bg-bg text-txt font-mono; }
+}
+
+/* ── Reusable component classes ───────────────────────────────────────── */
+@layer components {
+  .tab-btn {
+    @apply flex-1 whitespace-nowrap rounded-lg border border-line2 bg-panel2
+           px-2 py-[9px] text-[12px] text-dim transition-colors cursor-pointer;
+  }
+  .tab-btn:hover { @apply text-txt; }
+  .tab-btn[data-active="true"] { @apply border-sel bg-sel text-white; }
+
+  .seg-btn {
+    @apply flex-1 rounded-lg border border-line2 bg-panel2 p-[10px]
+           text-[12px] text-dim cursor-pointer;
+  }
+  .seg-btn[data-active="true"] { @apply border-sel bg-sel text-white; }
+
+  .field {
+    @apply w-full rounded-lg border border-line2 bg-panel2 p-[11px]
+           text-[13px] text-txt mb-[14px];
+  }
+  select.field { @apply cursor-pointer; }
+
+  .lbl { @apply block text-[11px] text-dim mb-[6px]; }
+
+  .btn-gen {
+    @apply w-full rounded-lg bg-green p-[13px] text-[14px] font-semibold
+           text-white cursor-pointer active:translate-y-px;
+  }
+
+  .out-box {
+    @apply mt-[18px] rounded-lg border border-dashed border-line2 bg-bg p-4 text-center;
+  }
+
+  .btn-copy {
+    @apply mt-3 hidden rounded-md border border-line2 bg-panel2 px-[14px] py-[6px]
+           text-[11px] text-[#b9c0cb] cursor-pointer;
+  }
+
+  .primary { @apply text-[21px] font-semibold tracking-[0.06em] break-all; }
+  .primary.is-empty { @apply text-[13px] font-normal tracking-normal text-faint; }
+
+  .meta { @apply mt-2 text-[11px] text-dim; }
+  .note { @apply mt-4 text-[10.5px] leading-[1.55]; color: #6b7280; }
+}
+
+/* ── Small stateful bits that read clearer as plain CSS ───────────────── */
+.note b { color: var(--color-amber); font-weight: 600; }
+.meta .ok { color: var(--color-green); }
+.meta .warn { color: var(--color-amber); }
+.resolve .val { color: var(--color-blue); font-weight: 600; }
+.resolve .legacy:not(.hidden) { color: var(--color-amber); font-size: 11px; margin-top: 4px; display: block; }
+#iban-out:not(.is-empty) { font-size: 15px; letter-spacing: 0.04em; }

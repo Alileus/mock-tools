@@ -1,0 +1,460 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="KSA Mock Fixtures Console"
+  description="Format-valid Saudi test identifiers — National ID, IBAN, UNN/CR, mobile. Fake, sandbox-only."
+>
+  <div class="mx-auto max-w-[480px]">
+    <div class="mb-0.5 flex items-baseline justify-between">
+      <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">KSA MOCK FIXTURES</h1>
+      <span class="text-[10px] uppercase tracking-[0.18em] text-faint">sandbox console</span>
+    </div>
+    <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
+    <p class="mb-[18px] mt-0 text-[11.5px] leading-[1.5] text-dim">
+      Format-valid test identifiers. Not real identities, accounts, or numbers. Keep off live lookups
+      and production rails.
+    </p>
+
+    <div class="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
+      <button class="tab-btn" data-tab="id" data-active="true" role="tab">National ID</button>
+      <button class="tab-btn" data-tab="iban" data-active="false" role="tab">IBAN</button>
+      <button class="tab-btn" data-tab="cr" data-active="false" role="tab">UNN / CR</button>
+      <button class="tab-btn" data-tab="phone" data-active="false" role="tab">Mobile</button>
+    </div>
+
+    <div class="rounded-xl border border-line bg-panel p-[22px]">
+      <!-- National ID -->
+      <section id="view-id">
+        <div class="mb-[14px] flex gap-2">
+          <button id="id-citizen" class="seg-btn" data-active="true">Citizen (1)</button>
+          <button id="id-resident" class="seg-btn" data-active="false">Resident (2)</button>
+        </div>
+        <button class="btn-gen" id="id-gen">Generate ID</button>
+        <div class="out-box">
+          <div class="primary is-empty" id="id-out">— press generate —</div>
+          <div class="meta" id="id-meta"></div>
+          <button class="btn-copy" id="id-copy">copy</button>
+        </div>
+        <p class="note">
+          10 digits. Lead 1 = citizen, 2 = resident. Last digit = Luhn check. Validated by Luhn (mod
+          10) — format only; won't resolve without matching DOB at a real backend.
+        </p>
+      </section>
+
+      <!-- IBAN -->
+      <section id="view-iban" class="hidden">
+        <div class="mb-[14px] flex gap-2">
+          <button id="iban-saudi" class="seg-btn" data-active="true">Saudi</button>
+          <button id="iban-intl" class="seg-btn" data-active="false">International</button>
+        </div>
+        <label class="lbl" for="iban-bank">Bank</label>
+        <select id="iban-bank" class="field"></select>
+        <button class="btn-gen" id="iban-gen">Generate IBAN</button>
+        <div class="out-box">
+          <div class="primary is-empty" id="iban-out">— select bank, generate —</div>
+          <div class="resolve hidden mt-[10px] text-[13px]" id="iban-resolveRow">
+            Resolved bank: <span class="val" id="iban-bankname"></span><span
+              class="legacy hidden"
+              id="iban-legacy"></span>
+          </div>
+          <div class="meta" id="iban-meta"></div>
+          <button class="btn-copy" id="iban-copy">copy</button>
+        </div>
+        <p class="note">
+          SA + 2 check + 2-digit SAMA bank code (chars 5–6) + 18-digit account = 24. MOD-97 (ISO 7064)
+          valid. <b>Bank-code table is third-party-sourced; verify against SAMA before non-sandbox use.</b>
+          ⚠ banks flag mergers/renames.
+        </p>
+      </section>
+
+      <!-- CR / UNN -->
+      <section id="view-cr" class="hidden">
+        <div class="mb-[14px] flex gap-2">
+          <button id="cr-unn" class="seg-btn" data-active="true">Unified No. (7)</button>
+          <button id="cr-legacy" class="seg-btn" data-active="false">Legacy CR</button>
+        </div>
+        <div id="cr-block" class="hidden">
+          <label class="lbl" for="cr-city"
+            >City prefix — <span class="text-amber">legacy, mostly unverified</span></label
+          >
+          <select id="cr-city" class="field"></select>
+          <label class="lbl" for="cr-custom">Or custom 4-digit prefix</label>
+          <input id="cr-custom" class="field" inputmode="numeric" maxlength="4" placeholder="e.g. 1010" />
+        </div>
+        <button class="btn-gen" id="cr-gen">Generate</button>
+        <div class="out-box">
+          <div class="primary is-empty" id="cr-out">— press generate —</div>
+          <div class="resolve hidden mt-[10px] text-[13px]" id="cr-resolveRow">
+            Resolved: <span class="val" id="cr-resolved"></span>
+          </div>
+          <div class="meta" id="cr-meta"></div>
+          <button class="btn-copy" id="cr-copy">copy</button>
+        </div>
+        <p class="note">
+          Legacy CR: 10 digits, first 4 = chamber/city (<b>only 1010=Riyadh corroborated</b>; phased
+          out by 2025 unified-CR reform). Unified No.: 10 digits starting 7. <b
+            >No public checksum for either — length+prefix shaped only, not validated.</b
+          >
+        </p>
+      </section>
+
+      <!-- Mobile -->
+      <section id="view-phone" class="hidden">
+        <label class="lbl" for="phone-op">Operator (selects prefix band)</label>
+        <select id="phone-op" class="field"></select>
+        <button class="btn-gen" id="phone-gen">Generate Mobile Number</button>
+        <div class="out-box">
+          <div class="primary is-empty" id="phone-out">— press generate —</div>
+          <div class="mt-1.5 text-[14px] text-dim" id="phone-intl"></div>
+          <div class="resolve hidden mt-[10px] text-[13px]" id="phone-resolveRow">
+            Prefix operator: <span class="val" id="phone-opname"></span>
+          </div>
+          <div class="meta" id="phone-meta"></div>
+          <div class="flex justify-center gap-2">
+            <button class="btn-copy" id="phone-copy-intl">copy +966…</button>
+            <button class="btn-copy" id="phone-copy-local">copy 0…</button>
+          </div>
+        </div>
+        <p class="note">
+          9-digit NSN starting 5 → local 05X XXX XXXX / E.164 +9665XXXXXXXX. <b>Portability:</b> prefix
+          shows originally-allocated operator, not necessarily current. No checksum — format only.
+        </p>
+      </section>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { track } from "@vercel/analytics";
+
+  /* ---------- shared ---------- */
+  const rd = (n: number) => {
+    let s = "";
+    for (let i = 0; i < n; i++) s += Math.floor(Math.random() * 10);
+    return s;
+  };
+  function wireCopy(btn: HTMLElement, getRaw: () => string, label: string, kind: string) {
+    btn.onclick = () =>
+      navigator.clipboard.writeText(getRaw().replace(/\s/g, "")).then(() => {
+        btn.textContent = "copied";
+        track("copy", { kind });
+        setTimeout(() => (btn.textContent = label), 1200);
+      });
+  }
+  const $ = (id: string) => document.getElementById(id)!;
+  const show = (el: Element) => el.classList.remove("hidden");
+  const hide = (el: Element) => el.classList.add("hidden");
+
+  /* ---------- tabs ---------- */
+  const tabs = Array.from(document.querySelectorAll<HTMLElement>(".tab-btn"));
+  const views: Record<string, string> = {
+    id: "view-id",
+    iban: "view-iban",
+    cr: "view-cr",
+    phone: "view-phone",
+  };
+  tabs.forEach(
+    (t) =>
+      (t.onclick = () => {
+        tabs.forEach((x) => (x.dataset.active = "false"));
+        t.dataset.active = "true";
+        Object.values(views).forEach((v) => hide($(v)));
+        const tab = t.dataset.tab!;
+        show($(views[tab]));
+        track("tab_switch", { tab });
+      })
+  );
+
+  /* ---------- National ID (Luhn) ---------- */
+  (() => {
+    let lead = 1;
+    const bC = $("id-citizen"),
+      bR = $("id-resident");
+    const out = $("id-out"),
+      meta = $("id-meta"),
+      copy = $("id-copy") as HTMLElement;
+    bC.onclick = () => {
+      lead = 1;
+      bC.dataset.active = "true";
+      bR.dataset.active = "false";
+    };
+    bR.onclick = () => {
+      lead = 2;
+      bR.dataset.active = "true";
+      bC.dataset.active = "false";
+    };
+    const check = (base: string) => {
+      const d = base.split("").map(Number);
+      let s = 0;
+      for (let i = d.length - 1, p = 0; i >= 0; i--, p++) {
+        let x = d[i];
+        if (p % 2 === 0) {
+          x *= 2;
+          if (x > 9) x -= 9;
+        }
+        s += x;
+      }
+      return (10 - (s % 10)) % 10;
+    };
+    const valid = (id: string) => {
+      if (!/^[12]\d{9}$/.test(id)) return false;
+      const d = id.split("").map(Number);
+      let s = 0;
+      for (let i = d.length - 1, p = 0; i >= 0; i--, p++) {
+        let x = d[i];
+        if (p % 2 === 1) {
+          x *= 2;
+          if (x > 9) x -= 9;
+        }
+        s += x;
+      }
+      return s % 10 === 0;
+    };
+    $("id-gen").onclick = () => {
+      const base = String(lead) + rd(8);
+      const id = base + check(base);
+      out.textContent = id;
+      out.classList.remove("is-empty");
+      meta.innerHTML =
+        (lead === 1 ? "Citizen" : "Resident") +
+        ' · Luhn <span class="ok">' +
+        (valid(id) ? "OK" : "FAIL") +
+        "</span>";
+      show(copy);
+      copy.dataset.raw = id;
+      track("generate", { tool: "national_id", subtype: lead === 1 ? "citizen" : "resident" });
+    };
+    wireCopy(copy, () => copy.dataset.raw!, "copy", "national_id");
+  })();
+
+  /* ---------- IBAN (MOD-97) ---------- */
+  (() => {
+    type Bank = { code: string; name: string; region: string; legacy?: string };
+    const BANKS: Bank[] = [
+      { code: "01", name: "Saudi Central Bank (SAMA)", region: "saudi" },
+      { code: "05", name: "Alinma Bank", region: "saudi" },
+      { code: "10", name: "Saudi National Bank (SNB)", region: "saudi", legacy: "From NCB (Al Ahli)+Samba merger, 2021. SWIFT NCBKSAJE is legacy NCB." },
+      { code: "15", name: "Bank AlBilad", region: "saudi" },
+      { code: "20", name: "Riyad Bank", region: "saudi" },
+      { code: "30", name: "Arab National Bank (ANB)", region: "saudi" },
+      { code: "40", name: "Samba Financial Group", region: "saudi", legacy: "Merged into SNB (2021). Legacy IBANs only." },
+      { code: "45", name: "Saudi Awwal Bank (SAB)", region: "saudi", legacy: "Formerly SABB; rebranded to SAB in 2023." },
+      { code: "50", name: "Saudi Awwal Bank (SAB) - ex-Alawwal", region: "saudi", legacy: "Alawwal merged into SABB (2019), now SAB." },
+      { code: "55", name: "Banque Saudi Fransi", region: "saudi" },
+      { code: "60", name: "Bank AlJazira", region: "saudi" },
+      { code: "65", name: "Saudi Investment Bank (SAIB)", region: "saudi" },
+      { code: "90", name: "Gulf International Bank (GIB-SA)", region: "saudi", legacy: "GIB Saudi Arabia is locally licensed; Bahrain parent." },
+      { code: "71", name: "National Bank of Bahrain (KSA)", region: "intl" },
+      { code: "75", name: "National Bank of Kuwait (KSA)", region: "intl" },
+      { code: "76", name: "Bank Muscat (KSA)", region: "intl" },
+      { code: "81", name: "Deutsche Bank (KSA)", region: "intl" },
+      { code: "82", name: "National Bank of Pakistan (KSA)", region: "intl" },
+      { code: "83", name: "State Bank of India (KSA)", region: "intl" },
+      { code: "84", name: "Turkiye Ziraat Bankasi (KSA)", region: "intl" },
+      { code: "86", name: "JP Morgan Chase (KSA)", region: "intl" },
+      { code: "87", name: "ICBC (KSA)", region: "intl" },
+      { code: "95", name: "Emirates NBD (KSA)", region: "intl" },
+      { code: "98", name: "BNP Paribas (KSA)", region: "intl" },
+    ];
+    const BY: Record<string, Bank> = Object.fromEntries(BANKS.map((b) => [b.code, b]));
+    let region = "saudi";
+    const sel = $("iban-bank") as HTMLSelectElement;
+    const bS = $("iban-saudi"),
+      bI = $("iban-intl");
+    const out = $("iban-out"),
+      meta = $("iban-meta"),
+      copy = $("iban-copy") as HTMLElement;
+    const rRow = $("iban-resolveRow"),
+      rName = $("iban-bankname"),
+      rLeg = $("iban-legacy");
+    function populate() {
+      sel.innerHTML = "";
+      const o = document.createElement("option");
+      o.value = "__random";
+      o.textContent = "Random (" + region + ")";
+      sel.appendChild(o);
+      BANKS.filter((b) => b.region === region).forEach((b) => {
+        const x = document.createElement("option");
+        x.value = b.code;
+        x.textContent = b.code + " — " + b.name + (b.legacy ? " ⚠" : "");
+        sel.appendChild(x);
+      });
+    }
+    bS.onclick = () => {
+      region = "saudi";
+      bS.dataset.active = "true";
+      bI.dataset.active = "false";
+      populate();
+    };
+    bI.onclick = () => {
+      region = "intl";
+      bI.dataset.active = "true";
+      bS.dataset.active = "false";
+      populate();
+    };
+    populate();
+    const mod97 = (s: string) => {
+      let r = 0;
+      for (let i = 0; i < s.length; i++) r = (r * 10 + (s.charCodeAt(i) - 48)) % 97;
+      return r;
+    };
+    const toNum = (s: string) => {
+      let r = "";
+      for (const c of s) r += c >= "0" && c <= "9" ? c : (c.charCodeAt(0) - 55).toString();
+      return r;
+    };
+    const gen = (code: string) => {
+      const bban = code + rd(18);
+      const chk = (98 - mod97(toNum(bban + "SA00"))).toString().padStart(2, "0");
+      return "SA" + chk + bban;
+    };
+    const valid = (ib: string) =>
+      /^SA\d{22}$/.test(ib) && mod97(toNum(ib.slice(4) + ib.slice(0, 4))) === 1;
+    const grp = (ib: string) => ib.replace(/(.{4})/g, "$1 ").trim();
+    $("iban-gen").onclick = () => {
+      let code = sel.value;
+      if (code === "__random") {
+        const p = BANKS.filter((b) => b.region === region);
+        code = p[Math.floor(Math.random() * p.length)].code;
+      }
+      const ib = gen(code);
+      out.textContent = grp(ib);
+      out.classList.remove("is-empty");
+      const b = BY[ib.slice(4, 6)];
+      show(rRow);
+      rName.textContent = b ? b.name : "UNKNOWN";
+      if (b && b.legacy) {
+        show(rLeg);
+        rLeg.textContent = "⚠ " + b.legacy;
+      } else hide(rLeg);
+      meta.innerHTML =
+        "Code " + ib.slice(4, 6) + ' · MOD-97 <span class="ok">' + (valid(ib) ? "OK" : "FAIL") + "</span>";
+      show(copy);
+      copy.dataset.raw = ib;
+      track("generate", { tool: "iban", region, bank: code });
+    };
+    wireCopy(copy, () => copy.dataset.raw!, "copy", "iban");
+  })();
+
+  /* ---------- CR / UNN (no checksum) ---------- */
+  (() => {
+    type City = { p: string; name: string; v: boolean };
+    const CITIES: City[] = [
+      { p: "1010", name: "Riyadh", v: true },
+      { p: "4030", name: "Jeddah", v: false },
+      { p: "2050", name: "Dammam (Eastern)", v: false },
+    ];
+    const BY: Record<string, City> = Object.fromEntries(CITIES.map((c) => [c.p, c]));
+    let mode = "unn";
+    const sel = $("cr-city") as HTMLSelectElement,
+      custom = $("cr-custom") as HTMLInputElement,
+      block = $("cr-block");
+    const bL = $("cr-legacy"),
+      bU = $("cr-unn");
+    const out = $("cr-out"),
+      meta = $("cr-meta"),
+      copy = $("cr-copy") as HTMLElement;
+    const rRow = $("cr-resolveRow"),
+      rVal = $("cr-resolved");
+    CITIES.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c.p;
+      o.textContent = c.p + " — " + c.name + (c.v ? "" : " (unverified)");
+      sel.appendChild(o);
+    });
+    bL.onclick = () => {
+      mode = "cr";
+      bL.dataset.active = "true";
+      bU.dataset.active = "false";
+      show(block);
+    };
+    bU.onclick = () => {
+      mode = "unn";
+      bU.dataset.active = "true";
+      bL.dataset.active = "false";
+      hide(block);
+    };
+    $("cr-gen").onclick = () => {
+      let num, info;
+      if (mode === "cr") {
+        let pre = custom.value.trim();
+        if (!/^\d{4}$/.test(pre)) pre = sel.value;
+        num = pre + rd(6);
+        const c = BY[pre];
+        show(rRow);
+        rVal.textContent = c
+          ? c.name + (c.v ? "" : " — UNVERIFIED prefix")
+          : "Unknown/custom prefix — mapping not confirmed";
+        info = "Legacy CR · prefix " + pre + ' · <span class="warn">no checksum</span>';
+      } else {
+        num = "7" + rd(9);
+        hide(rRow);
+        info = 'Unified No. · 7-series · <span class="warn">no checksum</span>';
+      }
+      out.textContent = num;
+      out.classList.remove("is-empty");
+      meta.innerHTML = info;
+      show(copy);
+      copy.dataset.raw = num;
+      track("generate", { tool: mode === "cr" ? "legacy_cr" : "unified_no" });
+    };
+    wireCopy(copy, () => copy.dataset.raw!, "copy", "cr");
+  })();
+
+  /* ---------- Mobile (no checksum) ---------- */
+  (() => {
+    type Op = { key: string; name: string; pre: string[] };
+    const OPS: Op[] = [
+      { key: "stc", name: "STC", pre: ["50", "53", "55"] },
+      { key: "mobily", name: "Mobily", pre: ["54", "56"] },
+      { key: "zain", name: "Zain", pre: ["58", "59"] },
+      { key: "salam", name: "Salam Mobile", pre: ["51"] },
+      { key: "mvno", name: "MVNO (Virgin/Lebara/RedBull/Salam)", pre: ["570", "571", "572", "574", "575", "576", "577", "578"] },
+    ];
+    const PMAP: Record<string, string> = {};
+    OPS.forEach((o) => o.pre.forEach((p) => (PMAP[p] = o.name)));
+    const sel = $("phone-op") as HTMLSelectElement;
+    const r = document.createElement("option");
+    r.value = "__random";
+    r.textContent = "Random operator";
+    sel.appendChild(r);
+    OPS.forEach((o) => {
+      const x = document.createElement("option");
+      x.value = o.key;
+      x.textContent = o.name;
+      sel.appendChild(x);
+    });
+    const out = $("phone-out"),
+      intl = $("phone-intl"),
+      meta = $("phone-meta");
+    const copyIntl = $("phone-copy-intl") as HTMLElement,
+      copyLocal = $("phone-copy-local") as HTMLElement;
+    const rRow = $("phone-resolveRow"),
+      rName = $("phone-opname");
+    $("phone-gen").onclick = () => {
+      const op =
+        sel.value === "__random"
+          ? OPS[Math.floor(Math.random() * OPS.length)]
+          : OPS.find((o) => o.key === sel.value)!;
+      const band = op.pre[Math.floor(Math.random() * op.pre.length)];
+      const nsn = band + rd(9 - band.length);
+      const local = "0" + nsn.slice(0, 2) + " " + nsn.slice(2, 5) + " " + nsn.slice(5);
+      const e164 = "+966" + nsn;
+      out.textContent = local;
+      out.classList.remove("is-empty");
+      intl.textContent = e164;
+      show(rRow);
+      rName.textContent = PMAP[band] || op.name;
+      meta.innerHTML = "NSN " + nsn + " · band 0" + band + " · 9 digits";
+      show(copyIntl);
+      copyIntl.dataset.raw = e164;
+      show(copyLocal);
+      copyLocal.dataset.raw = "0" + nsn;
+      track("generate", { tool: "mobile", operator: op.key });
+    };
+    wireCopy(copyIntl, () => copyIntl.dataset.raw!, "copy +966…", "mobile_intl");
+    wireCopy(copyLocal, () => copyLocal.dataset.raw!, "copy 0…", "mobile_local");
+  })();
+</script>

@@ -1,0 +1,41 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const tools = [
+  {
+    href: "/ksa",
+    name: "KSA Mock Fixtures",
+    blurb:
+      "Format-valid Saudi test identifiers — National ID (Luhn), IBAN (MOD-97), UNN/CR, and mobile numbers.",
+    tag: "identifiers",
+  },
+];
+---
+
+<Layout title="mock.alile.us · tools">
+  <h1 class="text-[18px] font-semibold tracking-[0.02em]">Mock tooling</h1>
+  <div class="my-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
+  <p class="mb-7 text-[12px] leading-relaxed text-dim">
+    Internal sandbox utilities. Everything here produces
+    <b class="text-amber">format-valid but fake</b> data — never real identities, accounts, or numbers.
+    Keep off live lookups and production rails.
+  </p>
+
+  <div class="grid gap-3 sm:grid-cols-2">
+    {
+      tools.map((tool) => (
+        <a
+          href={tool.href}
+          class="group rounded-xl border border-line bg-panel p-5 transition-colors hover:border-line2"
+        >
+          <div class="flex items-baseline justify-between">
+            <span class="text-[14px] font-semibold text-txt">{tool.name}</span>
+            <span class="text-[10px] uppercase tracking-[0.18em] text-faint">{tool.tag}</span>
+          </div>
+          <p class="mt-2 text-[12px] leading-relaxed text-dim">{tool.blurb}</p>
+          <span class="mt-3 inline-block text-[12px] text-blue group-hover:underline">Open →</span>
+        </a>
+      ))
+    }
+  </div>
+</Layout>

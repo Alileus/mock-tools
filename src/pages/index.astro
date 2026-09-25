@@ -1,39 +1,30 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import ToolShell from "../components/ToolShell.astro";
 import { HUB, TOOLS, REPOSITORY } from "../data/tools.mjs";
 ---
 
 <Layout title={HUB.title} description={HUB.description} image="/og/home.png">
-  <p class="mb-3 text-xs uppercase tracking-widest text-blue">Open source · No signup</p>
-  <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Test data, ready to use.</h1>
-  <p class="mb-8 mt-4 max-w-[570px] text-sm leading-7 text-dim">
-    Small tools for the data you need while building. Generate a batch, copy it into your project, and keep going.
-  </p>
-
-  <div class="grid gap-3 sm:grid-cols-2">
-    {
-      TOOLS.map((tool) => (
-        <a
-          href={tool.href}
-          class="group rounded-xl border border-line bg-panel p-5 no-underline transition-colors hover:border-line2"
-        >
+  <ToolShell title="Tools for building" subtitle="open source" description="Generate test data, convert text, and format JSON. Everything runs in your browser.">
+    <div class="divide-y divide-line">
+      {TOOLS.map((tool) => (
+        <a href={tool.href} class="group block py-4 first:pt-0 last:pb-0">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <span class="text-[14px] font-semibold text-txt">{tool.name}</span>
-            <span class="text-[10px] uppercase tracking-[0.18em] text-dim">{tool.category}</span>
+            <span class="text-[13px] font-semibold text-txt group-hover:text-blue">{tool.name} →</span>
+            <span class="text-[10px] uppercase tracking-[0.18em] text-faint">{tool.category}</span>
           </div>
-          <p class="mt-2 text-[12px] leading-relaxed text-dim">{tool.blurb}</p>
-          <span class="mt-3 inline-block text-[12px] text-blue group-hover:underline">Open →</span>
+          <p class="mt-2 text-[11.5px] leading-relaxed text-dim">{tool.blurb}</p>
         </a>
-      ))
-    }
-  </div>
-  <section class="mt-10 rounded-xl border border-line p-5">
-    <h2 class="text-sm font-semibold">Missing a tool?</h2>
-    <p class="mt-2 text-xs leading-6 text-dim">This started with Saudi fixtures. Now there's room for more: new formats, more countries, and the little utilities you keep rewriting.</p>
-    <div class="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-xs">
-      <a class="text-blue hover:underline" href={`${REPOSITORY}/issues/new/choose`}>Suggest a tool →</a>
-      <a class="text-blue hover:underline" href={`${REPOSITORY}/blob/main/CONTRIBUTING.md`}>Contribute on GitHub →</a>
+      ))}
     </div>
-  </section>
-  <p class="mt-5 text-xs leading-6 text-dim">Generated values stay in your browser. Regional identifiers are for sandbox testing and may overlap with real ones.</p>
+    <div class="mt-6 border-t border-line pt-5">
+      <h2 class="text-[13px] font-semibold">Missing a tool?</h2>
+      <p class="mt-2 text-[11.5px] leading-relaxed text-dim">New formats, more countries, or a utility you keep rewriting. Ideas and pull requests are welcome.</p>
+      <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px]">
+        <a class="text-blue hover:underline" href={`${REPOSITORY}/issues/new/choose`}>Suggest a tool →</a>
+        <a class="text-blue hover:underline" href={`${REPOSITORY}/blob/main/CONTRIBUTING.md`}>Contribute on GitHub →</a>
+      </div>
+    </div>
+    <p slot="note">No account or API key needed. Regional identifiers are for sandbox testing and may overlap with real ones.</p>
+  </ToolShell>
 </Layout>

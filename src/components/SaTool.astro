@@ -1,5 +1,6 @@
 ---
 import { SA_TABS, SA_BY_KEY } from "../data/tools.mjs";
+import ToolShell from "./ToolShell.astro";
 
 interface Props {
   active: string;
@@ -8,17 +9,8 @@ const { active } = Astro.props;
 const tab = SA_BY_KEY[active];
 ---
 
-<div class="mx-auto max-w-[480px]">
-  <div class="mb-0.5 flex flex-wrap items-baseline justify-between gap-2">
-    <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">SA MOCK FIXTURES</h1>
-    <span class="text-[10px] uppercase tracking-[0.18em] text-faint">sandbox console</span>
-  </div>
-  <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
-  <p class="mb-[18px] mt-0 text-[11.5px] leading-[1.5] text-dim">
-    <span class="text-txt">{tab.ogTitle}.</span> For sandbox format checks only. Generated values may overlap with real ones.
-  </p>
-
-  <nav class="mb-[18px] flex flex-wrap gap-1.5" aria-label="Saudi fixture tools">
+<ToolShell title="SA mock fixtures" subtitle="sandbox console" description={`${tab.ogTitle}. For sandbox format checks only. Generated values may overlap with real ones.`}>
+  <nav slot="navigation" class="mb-[18px] flex flex-wrap gap-1.5" aria-label="Saudi fixture tools">
     {
       SA_TABS.map((t) => (
         <a
@@ -33,7 +25,6 @@ const tab = SA_BY_KEY[active];
     }
   </nav>
 
-  <div class="rounded-xl border border-line bg-panel p-[22px]">
     {
       active === "id" && (
         <section id="view-id">
@@ -185,8 +176,8 @@ const tab = SA_BY_KEY[active];
         </section>
       )
     }
-  </div>
-</div>
+  <p id="copy-status" role="status" class="mt-3 text-xs text-dim"></p>
+</ToolShell>
 
 <script>
   import { track } from "@vercel/analytics";
@@ -198,16 +189,27 @@ const tab = SA_BY_KEY[active];
     return s;
   };
   function wireCopy(btn: HTMLElement, getRaw: () => string, label: string, kind: string) {
-    btn.onclick = () =>
-      navigator.clipboard.writeText(getRaw().replace(/\s/g, "")).then(() => {
+    btn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(getRaw().replace(/\s/g, ""));
+        $("copy-status").textContent = "Copied.";
         btn.textContent = "copied";
         track("copy", { kind });
         setTimeout(() => (btn.textContent = label), 1200);
-      });
+      } catch {
+        $("copy-status").textContent = "Clipboard unavailable. Select the value above and copy it manually.";
+      }
+    };
   }
   const $ = (id: string) => document.getElementById(id)!;
   const show = (el: Element) => el.classList.remove("hidden");
   const hide = (el: Element) => el.classList.add("hidden");
+  function setMeta(el: HTMLElement, text: string, status: string, className: string) {
+    const badge = document.createElement("span");
+    badge.className = className;
+    badge.textContent = status;
+    el.replaceChildren(document.createTextNode(text), badge);
+  }
 
   /* ---------- National ID (Luhn) ---------- */
   (() => {
@@ -234,11 +236,7 @@ const tab = SA_BY_KEY[active];
       const id = base + luhnCheckDigit(base);
       out.textContent = id;
       out.classList.remove("is-empty");
-      meta.innerHTML =
-        (lead === 1 ? "Citizen" : "Resident") +
-        ' · Luhn <span class="ok">' +
-        (isSaudiId(id) ? "OK" : "FAIL") +
-        "</span>";
+      setMeta(meta, `${lead === 1 ? "Citizen" : "Resident"} · Luhn `, isSaudiId(id) ? "OK" : "FAIL", "ok");
       show(copy);
       copy.dataset.raw = id;
       track("generate", { tool: "national_id", subtype: lead === 1 ? "citizen" : "resident" });
@@ -289,7 +287,7 @@ const tab = SA_BY_KEY[active];
       rName = $("iban-bankname"),
       rLeg = $("iban-legacy");
     function populate() {
-      sel.innerHTML = "";
+      sel.replaceChildren();
       const o = document.createElement("option");
       o.value = "__random";
       o.textContent = "Random (" + region + ")";
@@ -331,8 +329,7 @@ const tab = SA_BY_KEY[active];
         show(rLeg);
         rLeg.textContent = "⚠ " + b.legacy;
       } else hide(rLeg);
-      meta.innerHTML =
-        "Code " + ib.slice(4, 6) + ' · MOD-97 <span class="ok">' + (isSaudiIban(ib) ? "OK" : "FAIL") + "</span>";
+      setMeta(meta, `Code ${ib.slice(4, 6)} · MOD-97 `, isSaudiIban(ib) ? "OK" : "FAIL", "ok");
       show(copy);
       copy.dataset.raw = ib;
       track("generate", { tool: "iban", region, bank: code });
@@ -391,15 +388,15 @@ const tab = SA_BY_KEY[active];
         rVal.textContent = c
           ? c.name + (c.v ? "" : " — UNVERIFIED prefix")
           : "Unknown/custom prefix — mapping not confirmed";
-        info = "Legacy CR · prefix " + pre + ' · <span class="warn">no checksum</span>';
+        info = `Legacy CR · prefix ${pre} · `;
       } else {
         num = "7" + rd(9);
         hide(rRow);
-        info = 'Unified No. · 7-series · <span class="warn">no checksum</span>';
+        info = "Unified No. · 7-series · ";
       }
       out.textContent = num;
       out.classList.remove("is-empty");
-      meta.innerHTML = info;
+      setMeta(meta, info, "no checksum", "warn");
       show(copy);
       copy.dataset.raw = num;
       track("generate", { tool: mode === "cr" ? "legacy_cr" : "unified_no" });
@@ -453,7 +450,7 @@ const tab = SA_BY_KEY[active];
       intl.textContent = e164;
       show(rRow);
       rName.textContent = PMAP[band] || op.name;
-      meta.innerHTML = "NSN " + nsn + " · band 0" + band + " · 9 digits";
+      meta.textContent = "NSN " + nsn + " · band 0" + band + " · 9 digits";
       show(copyIntl);
       copyIntl.dataset.raw = e164;
       show(copyLocal);

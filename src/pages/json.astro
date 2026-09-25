@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TextTool from "../components/TextTool.astro";
+import ToolShell from "../components/ToolShell.astro";
+---
+
+<Layout title="JSON formatter | mock.alile.us" description="Pretty-print, minify, and validate JSON in your browser while preserving number precision. Copy or download the result.">
+  <ToolShell title="JSON formatter" subtitle="text tools" description="Make a response readable or compact it for a request. Invalid JSON shows an error.">
+    <TextTool kind="json" />
+    <p slot="note">Your input and output stay in this tab. Nothing is uploaded or saved by the tool.</p>
+  </ToolShell>
+</Layout>

@@ -1,0 +1,90 @@
+---
+import { MAX_TEXT_LENGTH } from "../lib/text-tools.mjs";
+interface Props { kind: "base64" | "json" }
+const { kind } = Astro.props;
+const json = kind === "json";
+---
+
+<section data-text-tool={kind}>
+  <label class="lbl" for="text-input">{json ? "JSON input" : "Text or Base64 input"}</label>
+  <textarea id="text-input" class="field h-48 resize-y bg-bg text-xs leading-6" maxlength={MAX_TEXT_LENGTH} spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="text-help" placeholder={json ? '{"hello":"world","items":[1,2,3]}' : "Paste text to encode, or Base64 to decode."}></textarea>
+  <div class="grid grid-cols-2 gap-2">
+    <button class="btn-gen" type="button" id="text-primary">{json ? "Pretty-print" : "Encode"}</button>
+    <button class="btn-gen border border-line2 bg-panel2 text-txt" type="button" id="text-secondary">{json ? "Minify" : "Decode"}</button>
+  </div>
+  <p id="text-help" class="my-4 text-xs leading-relaxed text-dim">{json ? "Two-space indentation. Number precision and key order are preserved." : "Standard Base64 and UTF-8 text. Base64 is encoding, not encryption."} Up to 1,000,000 input characters.</p>
+  <label class="lbl" for="text-output">Output</label>
+  <textarea id="text-output" class="field mb-0 h-64 resize-y border-dashed bg-bg text-xs leading-6" readonly spellcheck="false" placeholder="Your result will appear here."></textarea>
+  <div class="flex flex-wrap items-center gap-2">
+    <button class="btn-copy" id="text-copy" type="button" disabled>Copy</button>
+    <button class="btn-copy" id="text-download" type="button" disabled>Download</button>
+    <button class="btn-copy" id="text-clear" type="button">Clear</button>
+  </div>
+  <p id="text-status" class="mt-3 min-h-5 text-xs leading-relaxed text-dim" role="status" aria-live="polite">Ready when you are.</p>
+</section>
+
+<script>
+  import { track } from "@vercel/analytics";
+  import { encodeBase64, decodeBase64, formatJson } from "../lib/text-tools.mjs";
+
+  const root = document.querySelector<HTMLElement>("[data-text-tool]")!;
+  const json = root.dataset.textTool === "json";
+  const input = root.querySelector<HTMLTextAreaElement>("#text-input")!;
+  const output = root.querySelector<HTMLTextAreaElement>("#text-output")!;
+  const status = root.querySelector<HTMLElement>("#text-status")!;
+  const copy = root.querySelector<HTMLButtonElement>("#text-copy")!;
+  const download = root.querySelector<HTMLButtonElement>("#text-download")!;
+  let filename = json ? "formatted.json" : "encoded.txt";
+
+  function resetOutput() {
+    output.value = "";
+    copy.disabled = download.disabled = true;
+  }
+
+  function convert(secondary: boolean) {
+    resetOutput();
+    try {
+      output.value = json
+        ? formatJson(input.value, secondary ? "minify" : "pretty")
+        : secondary ? decodeBase64(input.value) : encodeBase64(input.value);
+      filename = json ? secondary ? "minified.json" : "formatted.json" : secondary ? "decoded.txt" : "encoded.txt";
+      copy.disabled = download.disabled = false;
+      status.textContent = json ? secondary ? "Minified." : "Formatted." : secondary ? "Decoded." : "Encoded.";
+      track("convert", { tool: json ? "json" : "base64", action: json ? secondary ? "minify" : "pretty" : secondary ? "decode" : "encode" });
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : "Could not convert this input.";
+    }
+  }
+
+  root.querySelector("#text-primary")!.addEventListener("click", () => convert(false));
+  root.querySelector("#text-secondary")!.addEventListener("click", () => convert(true));
+  input.addEventListener("input", () => {
+    resetOutput();
+    status.textContent = "Ready to convert.";
+  });
+  root.querySelector("#text-clear")!.addEventListener("click", () => {
+    input.value = "";
+    resetOutput();
+    status.textContent = "Cleared.";
+    input.focus();
+  });
+  copy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(output.value);
+      status.textContent = "Copied.";
+    } catch {
+      output.focus();
+      output.select();
+      status.textContent = "Clipboard unavailable. The output is selected so you can copy it manually.";
+    }
+  });
+  download.addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([output.value], { type: json ? "application/json;charset=utf-8" : "text/plain;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status.textContent = `Download started: ${filename}`;
+  });
+</script>

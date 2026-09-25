@@ -8,6 +8,8 @@ export const REPOSITORY = "https://github.com/alileus/mock-tools";
 export const TOOLS = [
   { key: "uuid", href: "/uuid", name: "Bulk UUIDs", navLabel: "UUIDs", category: "General", blurb: "Generate UUID v4 values in bulk. Copy or download as text or JSON." },
   { key: "records", href: "/records", name: "Sample records", navLabel: "Records", category: "General", blurb: "Repeatable user and product data for tests and demos. Export JSON or CSV." },
+  { key: "base64", href: "/base64", name: "Base64 converter", navLabel: "Base64", category: "Text", blurb: "Encode text to Base64 or decode it back. Supports Arabic, emoji, and other UTF-8 text." },
+  { key: "json", href: "/json", name: "JSON formatter", navLabel: "JSON", category: "Text", blurb: "Pretty-print, minify, and validate JSON without rounding large numbers." },
   { key: "sa", href: "/sa/id", name: "Saudi fixtures", navLabel: "Saudi fixtures", category: "Regional", blurb: "National IDs, IBANs, CR numbers, and mobile numbers for Saudi format checks." },
 ];
 
@@ -63,7 +65,7 @@ export const DEFAULT_SA_TAB = "id";
 export const HUB = {
   title: "mock.alile.us | Open source tools for test data",
   description:
-    "Free, open source tools for test data. Generate UUIDs, sample JSON and CSV records, and Saudi fixtures in your browser.",
+    "Free, open source developer tools. Generate test data, convert Base64, format JSON, and create Saudi fixtures in your browser.",
   ogTitle: "mock.alile.us",
   ogSubtitle: "Open source tools for test data",
 };

@@ -4,7 +4,7 @@ const { kind } = Astro.props;
 const records = kind === "records";
 ---
 
-<section class="rounded-xl border border-line bg-panel p-4 sm:p-6" data-batch-tool={kind}>
+<section data-batch-tool={kind}>
   <form id="batch-form">
     <div class="grid gap-x-4 sm:grid-cols-2">
       {records && <div>
@@ -36,7 +36,7 @@ const records = kind === "records";
   </form>
   <div class="mt-5">
     <label class="lbl" for="batch-output">Generated output</label>
-    <textarea id="batch-output" class="field mb-0 h-72 resize-y bg-bg text-xs leading-6" readonly spellcheck="false" placeholder="Your generated data will appear here." />
+    <textarea id="batch-output" class="field mb-0 h-72 resize-y border-dashed bg-bg text-xs leading-6" readonly spellcheck="false" placeholder="Your generated data will appear here." />
     <div class="flex flex-wrap items-center gap-2">
       <button class="btn-copy" id="batch-copy" type="button" disabled>Copy</button>
       <button class="btn-copy" id="batch-download" type="button" disabled>Download</button>

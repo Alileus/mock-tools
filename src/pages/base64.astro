@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TextTool from "../components/TextTool.astro";
+import ToolShell from "../components/ToolShell.astro";
+---
+
+<Layout title="Base64 converter | mock.alile.us" description="Encode UTF-8 text to Base64 or decode Base64 to text in your browser. Copy or download the result.">
+  <ToolShell title="Base64 converter" subtitle="text tools" description="Encode text or decode it back. Works with Arabic, emoji, and other Unicode text.">
+    <TextTool kind="base64" />
+    <p slot="note">Your input and output stay in this tab. Nothing is uploaded or saved by the tool.</p>
+  </ToolShell>
+</Layout>

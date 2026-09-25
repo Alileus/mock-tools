@@ -1,0 +1,22 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  subtitle?: string;
+}
+const { title, description, subtitle = "developer tools" } = Astro.props;
+---
+
+<section>
+  <div class="mb-0.5 flex flex-wrap items-baseline justify-between gap-2">
+    <h1 class="m-0 text-[15px] font-semibold uppercase tracking-[0.04em]">{title}</h1>
+    <span class="text-[10px] uppercase tracking-[0.18em] text-faint">{subtitle}</span>
+  </div>
+  <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
+  <p class="mb-[18px] mt-2 text-[11.5px] leading-[1.5] text-dim">{description}</p>
+  <slot name="navigation" />
+  <div class="rounded-xl border border-line bg-panel p-[22px]">
+    <slot />
+  </div>
+  {Astro.slots.has("note") && <div class="mt-4 text-[10.5px] leading-[1.55] text-dim"><slot name="note" /></div>}
+</section>

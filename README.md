@@ -12,6 +12,8 @@ This started with Saudi fixtures. It's now a home for useful generators from any
 | --- | --- |
 | [Bulk UUIDs](https://mock.alile.us/uuid/) | UUID v4 values, up to 1,000 at a time. Copy or download text or JSON. |
 | [Sample records](https://mock.alile.us/records/) | Seeded user and product datasets. The same seed gives the same records. Export JSON or CSV. |
+| [Base64 converter](https://mock.alile.us/base64/) | Encode UTF-8 text or decode standard Base64. Copy or download the result. |
+| [JSON formatter](https://mock.alile.us/json/) | Pretty-print, minify, and validate JSON. Preserves large numbers, key order, and string escapes. |
 | [Saudi fixtures](https://mock.alile.us/sa/id/) | National ID / Iqama, IBAN, CR / unified numbers, and mobile numbers. |
 
 Generators run in your browser. User fixtures use `example.test` email addresses. Regional identifiers match formats, but can overlap with real values. Use them in sandboxes, never for live identity checks, payments, calls, or messages. Some regional mappings are unverified and labeled in the tool.
@@ -50,9 +52,11 @@ The [contribution guide](CONTRIBUTING.md) covers where code goes, how to test it
 - Reusable generator logic lives in `src/lib/`; tests use Node's built-in test runner.
 - Vercel hosts [mock.alile.us](https://mock.alile.us). Merging to `main` deploys production; other branches do not deploy.
 
-Vercel Web Analytics records page visits and tool/copy events. Generated values and seeds are not included in custom events. See [Vercel's privacy documentation](https://vercel.com/docs/analytics/privacy-policy) for details.
+Vercel Web Analytics records page visits and tool, conversion, and copy events. Inputs, outputs, and seeds are not included in custom events. See [Vercel's privacy documentation](https://vercel.com/docs/analytics/privacy-policy) for details.
 
 Social images are committed in `public/og/`. Run `npm run generate:og` to regenerate them using the bundled IBM Plex Mono font package.
+
+Dependency updates arrive as weekly Dependabot PRs. CI checks Linux and Windows, dependency vulnerabilities, and the production build. GitHub also scans code and secrets. See [SECURITY.md](SECURITY.md) for private reports and [the maintenance guide](docs/MAINTAINING.md) for the repository setup.
 
 TypeScript stays on the latest 6.x release because the current `@astrojs/check` peer dependency does not support TypeScript 7 yet.
 The `fflate` override keeps Satori's ZIP dependency on a patched 0.7.x release; remove it once Satori updates its pinned version.

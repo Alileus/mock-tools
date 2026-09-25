@@ -1,11 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import BatchTool from "../components/BatchTool.astro";
+import ToolShell from "../components/ToolShell.astro";
 ---
 
 <Layout title="Sample JSON and CSV records | mock.alile.us" description="Generate repeatable user and product fixtures with a seed. Copy or download sample records as JSON or CSV.">
-  <h1 class="text-2xl font-semibold tracking-tight">Sample records</h1>
-  <p class="mb-6 mt-2 text-sm leading-relaxed text-dim">Fill a table, try an import, or mock an API response. Pick a dataset and export JSON or CSV.</p>
-  <BatchTool kind="records" />
-  <p class="mt-4 text-xs leading-relaxed text-dim">Made-up records for testing. Emails use example.test; product prices are in cents.</p>
+  <ToolShell title="Sample records" description="Fill a table, try an import, or mock an API response. Pick a dataset and export JSON or CSV.">
+    <BatchTool kind="records" />
+    <p slot="note">Made-up records for testing. Emails use example.test; product prices are in cents.</p>
+  </ToolShell>
 </Layout>

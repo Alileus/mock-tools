@@ -19,7 +19,7 @@
     "test": "node --test",
     "verify": "npm run check && npm test && npm run build",
     "generate:og": "node scripts/gen-og.mjs",
-    "build": "astro build",
+    "build": "astro build && node scripts/check-build.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

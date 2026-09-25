@@ -79,3 +79,15 @@ test("CSV preserves commas, quotes, newlines, booleans, zero, and missing values
   assert.equal(formatRecords([], "json"), "[]");
   assert.throws(() => formatRecords(records, "xml"), RangeError);
 });
+
+test("CSV treats formula-like strings as text without changing JSON or numbers", () => {
+  for (const value of ["=1+1", "+1", "-1", "@SUM(A1)", "  =1+1", "\ttext"]) {
+    assert.equal(csvCell(value), "'" + value);
+  }
+  assert.equal(csvCell("\r=1"), '"\'\r=1"');
+  assert.equal(csvCell("\n=1"), '"\'\n=1"');
+  assert.equal(csvCell(-42), "-42");
+  const records = [{ '=column': '=HYPERLINK("https://example.test","test")', number: -42 }];
+  assert.equal(formatRecords(records, "csv"), '\'=column,number\r\n"\'=HYPERLINK(""https://example.test"",""test"")",-42');
+  assert.deepEqual(JSON.parse(formatRecords(records, "json")), records);
+});

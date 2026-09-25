@@ -30,6 +30,7 @@
 
 @layer base {
   :root { color-scheme: dark; }
+  html { overflow-y: scroll; scrollbar-gutter: stable; }
   html, body { @apply bg-bg text-txt font-mono; }
   :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 3px; }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -50,6 +51,7 @@
 
 /* ── Reusable component classes ───────────────────────────────────────── */
 @layer components {
+  .site-container { @apply mx-auto w-full max-w-[512px] px-4; }
   .tab-btn {
     @apply flex-1 whitespace-nowrap rounded-lg border border-line2 bg-panel2
            px-2 py-[9px] text-center text-[12px] text-dim no-underline
@@ -94,6 +96,8 @@
 }
 
 /* ── Small stateful bits that read clearer as plain CSS ───────────────── */
+/* The root keeps its scrollbar gutter when Radix locks scrolling. Do not add a second gap. */
+html body[data-scroll-locked] { margin-right: 0 !important; }
 .note b { color: var(--color-amber); font-weight: 600; }
 .meta .ok { color: var(--color-green); }
 .meta .warn { color: var(--color-amber); }

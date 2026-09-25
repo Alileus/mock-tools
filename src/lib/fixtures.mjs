@@ -73,7 +73,9 @@ export function generateRecords({ count, seed, preset }) {
 
 /** @param {unknown} value */
 export function csvCell(value) {
-  const text = String(value ?? "");
+  let text = String(value ?? "");
+  // Keep text from becoming a spreadsheet formula. Numeric values stay numeric.
+  if (typeof value === "string" && /^(?:[\t\r\n]|\s*[=+@-])/.test(text)) text = "'" + text;
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 

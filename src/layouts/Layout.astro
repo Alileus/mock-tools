@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
 import { SITE_NAME, TOOLS, REPOSITORY } from "../data/tools.mjs";
+import { serializeJsonLd } from "../lib/security.mjs";
 
 interface Props {
   title: string;
@@ -76,13 +77,13 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage.href} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />
 
     <Analytics />
   </head>
   <body class="flex min-h-screen flex-col">
     <header class="border-b border-line">
-      <nav aria-label="Main navigation" class="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-x-5 gap-y-3 px-4 py-4">
+      <nav aria-label="Main navigation" class="site-container flex flex-wrap items-center justify-between gap-x-5 gap-y-3 py-4">
         <a href="/" class="text-[13px] font-semibold tracking-[0.04em] text-txt">
           mock<span class="text-faint">.alile.us</span>
         </a>
@@ -104,12 +105,12 @@ const jsonLd = {
       </nav>
     </header>
 
-    <main class="mx-auto w-full max-w-[760px] flex-1 px-4 py-8">
+    <main class="site-container flex-1 py-8">
       <slot />
     </main>
 
     <footer class="border-t border-line">
-      <div class="mx-auto flex max-w-[760px] flex-wrap justify-center gap-x-5 gap-y-3 px-4 py-5 text-xs leading-relaxed text-dim">
+      <div class="site-container flex flex-wrap justify-center gap-x-5 gap-y-3 py-5 text-[11px] leading-relaxed text-dim">
         <span>Built by <a href="https://github.com/alileus" class="hover:text-txt hover:underline">Ali</a> &amp; contributors</span>
         <a href={`${REPOSITORY}/blob/main/LICENSE`} class="hover:text-txt hover:underline">MIT license</a>
         <a href="https://discord.com/invite/alileus" class="hover:text-txt hover:underline">Discord</a>

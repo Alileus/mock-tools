@@ -12,9 +12,11 @@ This started with Saudi fixtures. It's now a home for useful generators from any
 | --- | --- |
 | [Bulk UUIDs](https://mock.alile.us/uuid/) | UUID v4 values, up to 1,000 at a time. Copy or download text or JSON. |
 | [Sample records](https://mock.alile.us/records/) | Seeded user and product datasets. The same seed gives the same records. Export JSON or CSV. |
-| [Saudi fixtures](https://mock.alile.us/ksa/id/) | National ID / Iqama, IBAN, CR / unified numbers, and mobile numbers. |
+| [Saudi fixtures](https://mock.alile.us/sa/id/) | National ID / Iqama, IBAN, CR / unified numbers, and mobile numbers. |
 
 Generators run in your browser. User fixtures use `example.test` email addresses. Regional identifiers match formats, but can overlap with real values. Use them in sandboxes, never for live identity checks, payments, calls, or messages. Some regional mappings are unverified and labeled in the tool.
+
+Country tools use lowercase two-letter ISO 3166-1 alpha-2 codes in their routes, such as `/sa/id` for Saudi Arabia. Existing `/ksa` links redirect to `/sa`.
 
 ## Run locally
 

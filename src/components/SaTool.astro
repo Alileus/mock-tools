@@ -1,16 +1,16 @@
 ---
-import { KSA_TABS, KSA_BY_KEY } from "../data/tools.mjs";
+import { SA_TABS, SA_BY_KEY } from "../data/tools.mjs";
 
 interface Props {
   active: string;
 }
 const { active } = Astro.props;
-const tab = KSA_BY_KEY[active];
+const tab = SA_BY_KEY[active];
 ---
 
 <div class="mx-auto max-w-[480px]">
   <div class="mb-0.5 flex flex-wrap items-baseline justify-between gap-2">
-    <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">KSA MOCK FIXTURES</h1>
+    <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">SA MOCK FIXTURES</h1>
     <span class="text-[10px] uppercase tracking-[0.18em] text-faint">sandbox console</span>
   </div>
   <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
@@ -20,9 +20,9 @@ const tab = KSA_BY_KEY[active];
 
   <nav class="mb-[18px] flex flex-wrap gap-1.5" aria-label="Saudi fixture tools">
     {
-      KSA_TABS.map((t) => (
+      SA_TABS.map((t) => (
         <a
-          href={`/ksa/${t.key}`}
+          href={`/sa/${t.key}`}
           class="tab-btn"
           data-active={(t.key === active).toString()}
           aria-current={t.key === active ? "page" : undefined}
@@ -254,7 +254,7 @@ const tab = KSA_BY_KEY[active];
     const BANKS: Bank[] = [
       { code: "01", name: "Saudi Central Bank (SAMA)", region: "saudi" },
       { code: "05", name: "Alinma Bank", region: "saudi" },
-      { code: "10", name: "Saudi National Bank (SNB)", region: "saudi", legacy: "From NCB (Al Ahli)+Samba merger, 2021. SWIFT NCBKSAJE is legacy NCB." },
+      { code: "10", name: "Saudi National Bank (SNB)", region: "saudi", legacy: "From NCB (Al Ahli)+Samba merger, 2021. SWIFT NCBSAJE is legacy NCB." },
       { code: "15", name: "Bank AlBilad", region: "saudi" },
       { code: "20", name: "Riyad Bank", region: "saudi" },
       { code: "30", name: "Arab National Bank (ANB)", region: "saudi" },
@@ -265,17 +265,17 @@ const tab = KSA_BY_KEY[active];
       { code: "60", name: "Bank AlJazira", region: "saudi" },
       { code: "65", name: "Saudi Investment Bank (SAIB)", region: "saudi" },
       { code: "90", name: "Gulf International Bank (GIB-SA)", region: "saudi", legacy: "GIB Saudi Arabia is locally licensed; Bahrain parent." },
-      { code: "71", name: "National Bank of Bahrain (KSA)", region: "intl" },
-      { code: "75", name: "National Bank of Kuwait (KSA)", region: "intl" },
-      { code: "76", name: "Bank Muscat (KSA)", region: "intl" },
-      { code: "81", name: "Deutsche Bank (KSA)", region: "intl" },
-      { code: "82", name: "National Bank of Pakistan (KSA)", region: "intl" },
-      { code: "83", name: "State Bank of India (KSA)", region: "intl" },
-      { code: "84", name: "Turkiye Ziraat Bankasi (KSA)", region: "intl" },
-      { code: "86", name: "JP Morgan Chase (KSA)", region: "intl" },
-      { code: "87", name: "ICBC (KSA)", region: "intl" },
-      { code: "95", name: "Emirates NBD (KSA)", region: "intl" },
-      { code: "98", name: "BNP Paribas (KSA)", region: "intl" },
+      { code: "71", name: "National Bank of Bahrain (SA)", region: "intl" },
+      { code: "75", name: "National Bank of Kuwait (SA)", region: "intl" },
+      { code: "76", name: "Bank Muscat (SA)", region: "intl" },
+      { code: "81", name: "Deutsche Bank (SA)", region: "intl" },
+      { code: "82", name: "National Bank of Pakistan (SA)", region: "intl" },
+      { code: "83", name: "State Bank of India (SA)", region: "intl" },
+      { code: "84", name: "Turkiye Ziraat Bankasi (SA)", region: "intl" },
+      { code: "86", name: "JP Morgan Chase (SA)", region: "intl" },
+      { code: "87", name: "ICBC (SA)", region: "intl" },
+      { code: "95", name: "Emirates NBD (SA)", region: "intl" },
+      { code: "98", name: "BNP Paribas (SA)", region: "intl" },
     ];
     const BY: Record<string, Bank> = Object.fromEntries(BANKS.map((b) => [b.code, b]));
     let region = "saudi";

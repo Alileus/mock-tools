@@ -26,6 +26,8 @@ Dropdowns use the shadcn component in `src/components/ui/select.tsx`. `FixtureSe
 
 ## What belongs here
 
+For country-specific tools, use the lowercase ISO 3166-1 alpha-2 code as the route prefix and tool key: `sa` for Saudi Arabia, `ae` for the UAE, or `gb` for the UK. Saudi pages live in `src/pages/sa/` and use `SaTool.astro` with `SA_TABS` metadata. Follow that naming pattern for new countries, and use the full country name in navigation labels.
+
 - Useful test data, mock payloads, IDs, and regional formats.
 - Tools that work locally in the browser without accounts or API keys.
 - Clear limits: distinguish a correct checksum from a real or verified identity.

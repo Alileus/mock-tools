@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BatchTool from "../components/BatchTool.astro";
+---
+
+<Layout title="Bulk UUID generator | mock.alile.us" description="Generate up to 1,000 random UUID v4 values in your browser. Copy or download as text or JSON.">
+  <h1 class="text-2xl font-semibold tracking-tight">Bulk UUIDs</h1>
+  <p class="mb-6 mt-2 text-sm leading-relaxed text-dim">Random UUID v4 values for your fixtures, database seeds, and API tests.</p>
+  <BatchTool kind="uuid" />
+  <p class="mt-4 text-xs leading-relaxed text-dim">Generated in your browser with Web Crypto. Each batch is new.</p>
+</Layout>

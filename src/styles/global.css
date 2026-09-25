@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* ── Design tokens (ported from the original bespoke palette) ─────────── */
 @theme {
@@ -14,6 +15,15 @@
   --color-blue:   #60a5fa;
   --color-amber:  #f59e0b;
   --color-sel:    #2563eb;
+  --color-background: #0f1115;
+  --color-popover: #1e222b;
+  --color-popover-foreground: #e6e8eb;
+  --color-input: #2c313b;
+  --color-muted: #262a33;
+  --color-muted-foreground: #8b919c;
+  --color-accent: #2563eb;
+  --color-accent-foreground: #ffffff;
+  --color-ring: #60a5fa;
 
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -21,6 +31,8 @@
 @layer base {
   :root { color-scheme: dark; }
   html, body { @apply bg-bg text-txt font-mono; }
+  :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 3px; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   /* Thin, brand-colored scrollbar */
   * {
@@ -56,7 +68,7 @@
     @apply w-full rounded-lg border border-line2 bg-panel2 p-[11px]
            text-[13px] text-txt mb-[14px];
   }
-  select.field { @apply cursor-pointer; }
+  select.field { @apply cursor-pointer; min-width: 0; }
 
   .lbl { @apply block text-[11px] text-dim mb-[6px]; }
 

@@ -1,0 +1,29 @@
+name: Bug report
+description: Something isn't working or a fixture format is wrong.
+labels: [bug]
+body:
+  - type: input
+    id: tool
+    attributes:
+      label: Which tool or page?
+      placeholder: https://mock.alile.us/records/
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include your browser and the options you selected. Use synthetic data only.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Screenshots or reference links
+      description: For an incorrect format or mapping, link an official source if possible.

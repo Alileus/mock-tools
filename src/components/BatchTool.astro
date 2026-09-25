@@ -1,0 +1,123 @@
+---
+interface Props { kind: "uuid" | "records" }
+const { kind } = Astro.props;
+const records = kind === "records";
+---
+
+<section class="rounded-xl border border-line bg-panel p-4 sm:p-6" data-batch-tool={kind}>
+  <form id="batch-form">
+    <div class="grid gap-x-4 sm:grid-cols-2">
+      {records && <div>
+        <label class="lbl" for="preset">Dataset</label>
+        <select class="field" id="preset" name="preset">
+          <option value="users">Users</option>
+          <option value="products">Products</option>
+        </select>
+      </div>}
+      <div>
+        <label class="lbl" for="count">How many? (1 to 1,000)</label>
+        <input class="field" id="count" name="count" type="number" min="1" max="1000" step="1" value="10" required />
+      </div>
+      {records && <div>
+        <label class="lbl" for="seed">Seed</label>
+        <input class="field" id="seed" name="seed" value="hello-world" maxlength="80" required aria-describedby="seed-help" />
+      </div>}
+      <div>
+        <label class="lbl" for="format">Output format</label>
+        <select class="field" id="format" name="format">
+          {!records && <option value="text">Text (one per line)</option>}
+          <option value="json">JSON</option>
+          {records && <option value="csv">CSV</option>}
+        </select>
+      </div>
+    </div>
+    {records && <p class="mb-4 text-xs leading-relaxed text-dim" id="seed-help">Same seed, same records. Change it for a different batch.</p>}
+    <button class="btn-gen" type="submit">{records ? "Generate records" : "Generate UUIDs"}</button>
+  </form>
+  <div class="mt-5">
+    <label class="lbl" for="batch-output">Generated output</label>
+    <textarea id="batch-output" class="field mb-0 h-72 resize-y bg-bg text-xs leading-6" readonly spellcheck="false" placeholder="Your generated data will appear here." />
+    <div class="flex flex-wrap items-center gap-2">
+      <button class="btn-copy" id="batch-copy" type="button" disabled>Copy</button>
+      <button class="btn-copy" id="batch-download" type="button" disabled>Download</button>
+    </div>
+    <p id="batch-status" class="mt-3 min-h-5 text-xs leading-relaxed text-dim" role="status" aria-live="polite">Ready when you are.</p>
+  </div>
+</section>
+
+<script>
+  import { track } from "@vercel/analytics";
+  import { generateUuids, generateRecords, formatRecords, formatUuids } from "../lib/fixtures.mjs";
+
+  const root = document.querySelector<HTMLElement>("[data-batch-tool]")!;
+  const kind = root.dataset.batchTool!;
+  const form = document.querySelector<HTMLFormElement>("#batch-form")!;
+  const format = document.querySelector<HTMLSelectElement>("#format")!;
+  const output = document.querySelector<HTMLTextAreaElement>("#batch-output")!;
+  const status = document.querySelector<HTMLElement>("#batch-status")!;
+  const copy = document.querySelector<HTMLButtonElement>("#batch-copy")!;
+  const download = document.querySelector<HTMLButtonElement>("#batch-download")!;
+  let uuids: string[] = [];
+  let records: Record<string, unknown>[] = [];
+  let filename = kind;
+
+  function render() {
+    output.value = kind === "uuid" ? formatUuids(uuids, format.value) : formatRecords(records, format.value);
+    copy.disabled = download.disabled = !output.value;
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      const data = new FormData(form);
+      const count = Number(data.get("count"));
+      if (kind === "uuid") {
+        uuids = generateUuids(count);
+      } else {
+        const preset = String(data.get("preset"));
+        records = generateRecords({ count, seed: String(data.get("seed")), preset });
+        filename = preset;
+      }
+      render();
+      status.textContent = `Generated ${count} ${kind === "uuid" ? "UUIDs" : "records"}.`;
+      track("generate", { tool: kind });
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : "Could not generate this batch.";
+    }
+  });
+
+  format.addEventListener("change", () => {
+    if (uuids.length || records.length) {
+      render();
+      status.textContent = "Format updated. Your data is unchanged.";
+    }
+  });
+
+  form.addEventListener("input", (event) => {
+    if (event.target !== format && output.value) status.textContent = "Press Generate to apply your changes.";
+  });
+
+  copy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(output.value);
+      status.textContent = "Copied.";
+      track("copy", { kind });
+    } catch {
+      output.focus();
+      output.select();
+      status.textContent = "Clipboard unavailable. The output is selected so you can copy it manually.";
+    }
+  });
+
+  download.addEventListener("click", () => {
+    const extension = format.value === "text" ? "txt" : format.value;
+    const mime = { txt: "text/plain", json: "application/json", csv: "text/csv" }[extension];
+    const url = URL.createObjectURL(new Blob([output.value], { type: `${mime};charset=utf-8` }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.${extension}`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status.textContent = `Download started: ${filename}.${extension}`;
+  });
+</script>

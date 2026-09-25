@@ -1,0 +1,31 @@
+name: Tool or format idea
+description: Suggest a new generator, export format, or regional fixture.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What would you use this for?
+      description: A concrete example helps us decide the scope.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Example input and output
+      description: Use made-up values. Include preferred formats and options.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Specifications or references
+      description: Link official documentation for regional formats or checksums.
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to work on it?
+      options:
+        - Just sharing the idea
+        - Yes, I'd like to open a PR
+        - I could help with testing or documentation

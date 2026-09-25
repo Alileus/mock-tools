@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
-import { SITE_NAME } from "../data/tools.mjs";
+import { SITE_NAME, TOOLS, REPOSITORY } from "../data/tools.mjs";
 
 interface Props {
   title: string;
@@ -26,8 +26,8 @@ const canonical = new URL(pathWithSlash, site);
 const ogImage = new URL(image, site);
 
 const nav = [
-  { href: "/", label: "Hub", match: (p: string) => p === "/" },
-  { href: "/ksa/id", label: "KSA Fixtures", match: (p: string) => p.startsWith("/ksa") },
+  { href: "/", label: "All tools", match: (p: string) => p === "/" },
+  ...TOOLS.map((tool) => ({ href: tool.href, label: tool.navLabel, match: (p: string) => p === `/${tool.key}` || p.startsWith(`/${tool.key}/`) })),
 ];
 
 const path = Astro.url.pathname;
@@ -82,16 +82,18 @@ const jsonLd = {
   </head>
   <body class="flex min-h-screen flex-col">
     <header class="border-b border-line">
-      <nav class="mx-auto flex max-w-[760px] items-center gap-5 px-4 py-3">
+      <nav aria-label="Main navigation" class="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-x-5 gap-y-3 px-4 py-4">
         <a href="/" class="text-[13px] font-semibold tracking-[0.04em] text-txt">
           mock<span class="text-faint">.alile.us</span>
         </a>
-        <div class="flex gap-1">
+        <a href={REPOSITORY} class="text-xs text-dim hover:text-txt">GitHub ↗</a>
+        <div class="flex w-full flex-wrap gap-1">
           {
             nav.map((item) => (
               <a
                 href={item.href}
                 data-active={item.match(path).toString()}
+                aria-current={item.match(path) ? "page" : undefined}
                 class="rounded-md px-2.5 py-1 text-[12px] text-dim transition-colors hover:text-txt data-[active=true]:bg-panel2 data-[active=true]:text-txt"
               >
                 {item.label}
@@ -107,15 +109,18 @@ const jsonLd = {
     </main>
 
     <footer class="border-t border-line">
-      <div class="mx-auto max-w-[760px] px-4 py-5 text-center text-[11px] leading-relaxed text-faint">
-        Managed by Ali · <a
-          href="https://discord.com/invite/alileus"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-dim underline-offset-2 transition-colors hover:text-txt hover:underline"
-          >join the Alileus Discord</a
-        > — reach out for an update or fix.
+      <div class="mx-auto flex max-w-[760px] flex-wrap justify-center gap-x-5 gap-y-3 px-4 py-5 text-xs leading-relaxed text-dim">
+        <span>Built by <a href="https://github.com/alileus" class="hover:text-txt hover:underline">Ali</a> &amp; contributors</span>
+        <a href={`${REPOSITORY}/blob/main/LICENSE`} class="hover:text-txt hover:underline">MIT license</a>
+        <a href="https://discord.com/invite/alileus" class="hover:text-txt hover:underline">Discord</a>
       </div>
     </footer>
   </body>
 </html>
+
+<script>
+  if (document.querySelector("select.field")) {
+    const { enhanceSelects } = await import("../components/FixtureSelect");
+    enhanceSelects();
+  }
+</script>

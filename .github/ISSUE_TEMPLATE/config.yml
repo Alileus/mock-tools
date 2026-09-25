@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and discussion
+    url: https://github.com/alileus/mock-tools/discussions
+    about: Ask for help or talk through an idea.
+  - name: Private security report
+    url: https://github.com/alileus/mock-tools/security/advisories/new
+    about: Report a vulnerability privately.

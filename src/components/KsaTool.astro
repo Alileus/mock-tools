@@ -9,23 +9,21 @@ const tab = KSA_BY_KEY[active];
 ---
 
 <div class="mx-auto max-w-[480px]">
-  <div class="mb-0.5 flex items-baseline justify-between">
+  <div class="mb-0.5 flex flex-wrap items-baseline justify-between gap-2">
     <h1 class="m-0 text-[15px] font-semibold tracking-[0.04em]">KSA MOCK FIXTURES</h1>
     <span class="text-[10px] uppercase tracking-[0.18em] text-faint">sandbox console</span>
   </div>
   <div class="mb-1 mt-2 h-0.5 rounded bg-gradient-to-r from-green via-blue to-transparent"></div>
   <p class="mb-[18px] mt-0 text-[11.5px] leading-[1.5] text-dim">
-    <span class="text-txt">{tab.ogTitle}.</span> Format-valid but fake — keep off live lookups and
-    production rails.
+    <span class="text-txt">{tab.ogTitle}.</span> For sandbox format checks only. Generated values may overlap with real ones.
   </p>
 
-  <div class="mb-[18px] flex flex-wrap gap-1.5" role="tablist">
+  <nav class="mb-[18px] flex flex-wrap gap-1.5" aria-label="Saudi fixture tools">
     {
       KSA_TABS.map((t) => (
         <a
           href={`/ksa/${t.key}`}
           class="tab-btn"
-          role="tab"
           data-active={(t.key === active).toString()}
           aria-current={t.key === active ? "page" : undefined}
         >
@@ -33,7 +31,7 @@ const tab = KSA_BY_KEY[active];
         </a>
       ))
     }
-  </div>
+  </nav>
 
   <div class="rounded-xl border border-line bg-panel p-[22px]">
     {
@@ -60,8 +58,7 @@ const tab = KSA_BY_KEY[active];
             </button>
           </div>
           <p class="note">
-            10 digits. Lead 1 = citizen, 2 = resident. Last digit = Luhn check. Validated by Luhn (mod
-            10) — format only; won't resolve without matching DOB at a real backend.
+            10 digits. Lead 1 = citizen, 2 = resident. Last digit = Luhn check. A correct checksum doesn't mean the number is unassigned.
           </p>
         </section>
       )
@@ -193,6 +190,7 @@ const tab = KSA_BY_KEY[active];
 
 <script>
   import { track } from "@vercel/analytics";
+  import { luhnCheckDigit, isSaudiId, createSaudiIban, isSaudiIban } from "../lib/checksums.mjs";
 
   const rd = (n: number) => {
     let s = "";
@@ -231,42 +229,15 @@ const tab = KSA_BY_KEY[active];
       bR.dataset.active = "true";
       bC.dataset.active = "false";
     };
-    const check = (base: string) => {
-      const d = base.split("").map(Number);
-      let s = 0;
-      for (let i = d.length - 1, p = 0; i >= 0; i--, p++) {
-        let x = d[i];
-        if (p % 2 === 0) {
-          x *= 2;
-          if (x > 9) x -= 9;
-        }
-        s += x;
-      }
-      return (10 - (s % 10)) % 10;
-    };
-    const valid = (id: string) => {
-      if (!/^[12]\d{9}$/.test(id)) return false;
-      const d = id.split("").map(Number);
-      let s = 0;
-      for (let i = d.length - 1, p = 0; i >= 0; i--, p++) {
-        let x = d[i];
-        if (p % 2 === 1) {
-          x *= 2;
-          if (x > 9) x -= 9;
-        }
-        s += x;
-      }
-      return s % 10 === 0;
-    };
     genBtn.onclick = () => {
       const base = String(lead) + rd(8);
-      const id = base + check(base);
+      const id = base + luhnCheckDigit(base);
       out.textContent = id;
       out.classList.remove("is-empty");
       meta.innerHTML =
         (lead === 1 ? "Citizen" : "Resident") +
         ' · Luhn <span class="ok">' +
-        (valid(id) ? "OK" : "FAIL") +
+        (isSaudiId(id) ? "OK" : "FAIL") +
         "</span>";
       show(copy);
       copy.dataset.raw = id;
@@ -343,23 +314,6 @@ const tab = KSA_BY_KEY[active];
       populate();
     };
     populate();
-    const mod97 = (s: string) => {
-      let r = 0;
-      for (let i = 0; i < s.length; i++) r = (r * 10 + (s.charCodeAt(i) - 48)) % 97;
-      return r;
-    };
-    const toNum = (s: string) => {
-      let r = "";
-      for (const c of s) r += c >= "0" && c <= "9" ? c : (c.charCodeAt(0) - 55).toString();
-      return r;
-    };
-    const gen = (code: string) => {
-      const bban = code + rd(18);
-      const chk = (98 - mod97(toNum(bban + "SA00"))).toString().padStart(2, "0");
-      return "SA" + chk + bban;
-    };
-    const valid = (ib: string) =>
-      /^SA\d{22}$/.test(ib) && mod97(toNum(ib.slice(4) + ib.slice(0, 4))) === 1;
     const grp = (ib: string) => ib.replace(/(.{4})/g, "$1 ").trim();
     genBtn.onclick = () => {
       let code = sel.value;
@@ -367,7 +321,7 @@ const tab = KSA_BY_KEY[active];
         const p = BANKS.filter((b) => b.region === region);
         code = p[Math.floor(Math.random() * p.length)].code;
       }
-      const ib = gen(code);
+      const ib = createSaudiIban(code, rd(18));
       out.textContent = grp(ib);
       out.classList.remove("is-empty");
       const b = BY[ib.slice(4, 6)];
@@ -378,7 +332,7 @@ const tab = KSA_BY_KEY[active];
         rLeg.textContent = "⚠ " + b.legacy;
       } else hide(rLeg);
       meta.innerHTML =
-        "Code " + ib.slice(4, 6) + ' · MOD-97 <span class="ok">' + (valid(ib) ? "OK" : "FAIL") + "</span>";
+        "Code " + ib.slice(4, 6) + ' · MOD-97 <span class="ok">' + (isSaudiIban(ib) ? "OK" : "FAIL") + "</span>";
       show(copy);
       copy.dataset.raw = ib;
       track("generate", { tool: "iban", region, bank: code });

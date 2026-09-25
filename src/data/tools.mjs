@@ -3,6 +3,13 @@
 
 export const SITE = "https://mock.alile.us";
 export const SITE_NAME = "mock.alile.us";
+export const REPOSITORY = "https://github.com/alileus/mock-tools";
+
+export const TOOLS = [
+  { key: "uuid", href: "/uuid", name: "Bulk UUIDs", navLabel: "UUIDs", category: "General", blurb: "Generate UUID v4 values in bulk. Copy or download as text or JSON." },
+  { key: "records", href: "/records", name: "Sample records", navLabel: "Records", category: "General", blurb: "Repeatable user and product data for tests and demos. Export JSON or CSV." },
+  { key: "ksa", href: "/ksa/id", name: "Saudi fixtures", navLabel: "Saudi fixtures", category: "Regional", blurb: "National IDs, IBANs, CR numbers, and mobile numbers for Saudi format checks." },
+];
 
 // KSA fixtures: one entry per tab/route under /ksa/<key>.
 export const KSA_TABS = [
@@ -53,9 +60,9 @@ export const DEFAULT_KSA_TAB = "id";
 
 // Hub / home metadata.
 export const HUB = {
-  title: "mock.alile.us — format-valid fake test fixtures",
+  title: "mock.alile.us | Open source tools for test data",
   description:
-    "Sandbox utilities that generate format-valid but fake test fixtures — Saudi National IDs, IBANs, CR/Unified numbers, and mobile numbers. For testing only.",
+    "Free, open source tools for test data. Generate UUIDs, sample JSON and CSV records, and Saudi fixtures in your browser.",
   ogTitle: "mock.alile.us",
-  ogSubtitle: "Format-valid fake test fixtures for developers",
+  ogSubtitle: "Open source tools for test data",
 };

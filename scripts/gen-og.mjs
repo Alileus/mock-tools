@@ -7,14 +7,14 @@ import path from "node:path";
 import satori from "satori";
 import { html } from "satori-html";
 import { Resvg } from "@resvg/resvg-js";
-import { KSA_TABS, HUB } from "../src/data/tools.mjs";
+import { KSA_TABS, HUB, TOOLS } from "../src/data/tools.mjs";
 
 const OUT_DIR = path.resolve("public/og");
-const FONTS = "C:/Windows/Fonts";
+const FONTS = new URL("../node_modules/@fontsource/ibm-plex-mono/files/", import.meta.url);
 
 const fonts = [
-  { name: "Consolas", data: fs.readFileSync(`${FONTS}/consola.ttf`), weight: 400, style: "normal" },
-  { name: "Consolas", data: fs.readFileSync(`${FONTS}/consolab.ttf`), weight: 700, style: "normal" },
+  { name: "IBM Plex Mono", data: fs.readFileSync(new URL("ibm-plex-mono-latin-400-normal.woff", FONTS)), weight: 400, style: "normal" },
+  { name: "IBM Plex Mono", data: fs.readFileSync(new URL("ibm-plex-mono-latin-700-normal.woff", FONTS)), weight: 700, style: "normal" },
 ];
 
 const C = {
@@ -34,7 +34,7 @@ const chip = (label, active) => `
 function card({ title, subtitle, chips }) {
   return html(`
     <div style="display:flex;flex-direction:column;justify-content:space-between;
-                width:1200px;height:630px;background:${C.bg};padding:72px;font-family:Consolas;">
+                width:1200px;height:630px;background:${C.bg};padding:72px;font-family:IBM Plex Mono;">
       <div style="display:flex;flex-direction:column;">
         <div style="display:flex;height:8px;width:300px;border-radius:8px;
                     background:linear-gradient(90deg,${C.green},#60a5fa 70%,rgba(96,165,250,0));"></div>
@@ -47,7 +47,7 @@ function card({ title, subtitle, chips }) {
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div style="display:flex;">${chips}</div>
-        <div style="display:flex;font-size:23px;color:${C.faint};">format-valid · fake · sandbox</div>
+        <div style="display:flex;font-size:20px;color:${C.faint};">built for testing</div>
       </div>
     </div>`);
 }
@@ -64,7 +64,7 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
 const allChips = (activeKey) => KSA_TABS.map((t) => chip(t.label, t.key === activeKey)).join("");
 
 // Home card
-await render("home", card({ title: HUB.ogTitle, subtitle: HUB.ogSubtitle, chips: allChips(null) }));
+await render("home", card({ title: HUB.ogTitle, subtitle: HUB.ogSubtitle, chips: TOOLS.map((tool) => chip(tool.navLabel, false)).join("") }));
 
 // Per-tab cards
 for (const t of KSA_TABS) {

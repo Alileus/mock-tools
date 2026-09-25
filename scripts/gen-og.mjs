@@ -7,7 +7,7 @@ import path from "node:path";
 import satori from "satori";
 import { html } from "satori-html";
 import { Resvg } from "@resvg/resvg-js";
-import { KSA_TABS, HUB, TOOLS } from "../src/data/tools.mjs";
+import { SA_TABS, HUB, TOOLS } from "../src/data/tools.mjs";
 
 const OUT_DIR = path.resolve("public/og");
 const FONTS = new URL("../node_modules/@fontsource/ibm-plex-mono/files/", import.meta.url);
@@ -61,13 +61,13 @@ async function render(name, markup) {
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-const allChips = (activeKey) => KSA_TABS.map((t) => chip(t.label, t.key === activeKey)).join("");
+const allChips = (activeKey) => SA_TABS.map((t) => chip(t.label, t.key === activeKey)).join("");
 
 // Home card
 await render("home", card({ title: HUB.ogTitle, subtitle: HUB.ogSubtitle, chips: TOOLS.map((tool) => chip(tool.navLabel, false)).join("") }));
 
 // Per-tab cards
-for (const t of KSA_TABS) {
+for (const t of SA_TABS) {
   await render(t.key, card({ title: t.ogTitle, subtitle: t.ogSubtitle, chips: allChips(t.key) }));
 }
 
